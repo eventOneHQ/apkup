@@ -1,0 +1,25 @@
+{
+  "name": "google-play-publisher",
+  "version": "0.1.0",
+  "description": "Publish APKs to Google Play Store",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jeduan/google-play-publisher"
+  },
+  "keywords": [
+    "android",
+    "google",
+    "play",
+    "apk"
+  ],
+  "author": "Jeduan Cornejo <jeduan@gmail.com>",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/jeduan/google-play-publisher/issues"
+  },
+  "homepage": "https://github.com/jeduan/google-play-publisher"
+}

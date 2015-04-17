@@ -3,6 +3,7 @@ var async = require('async')
 var google = require('googleapis')
 var assert = require('assert')
 var debug = require('debug')('google-play-publisher')
+var apkParser = require('node-apk-parser')
 
 var publisher = google.androidpublisher('v2')
 
@@ -24,17 +25,34 @@ function Publisher (options) {
 
 Publisher.tracks = ['alpha', 'beta', 'production', 'rollout']
 
-Publisher.prototype.upload = function upload (track, params, callback) {
-  assert(Publisher.tracks.indexOf(track) !== -1, 'Unknown track')
+Publisher.prototype.upload = function upload (apk, params, callback) {
+  assert(apk, 'I require an APK route')
   params = params || {}
-  assert(params.apk, 'I require an APK route')
+  params.track = params.track || 'beta'
+  assert(Publisher.tracks.indexOf(params.track) !== -1, 'Unknown track')
 
   var self = this
   var editId
+  var packageName
+  var versionCode
 
   async.waterfall([
 
-    function (done) {
+    function parseManifest (done) {
+      try {
+        var reader = apkParser.readFile(apk)
+        var manifest = reader.readManifestSync()
+        packageName = manifest.package
+        versionCode = manifest.versionCode
+        debug('Detected package name %s', packageName)
+        debug('Detected version code %d', versionCode)
+        done()
+      } catch (err) {
+        done(err)
+      }
+    },
+
+    function authenticate (done) {
       debug('> Authenticating')
       self.client.authorize(function (err) {
         debug('> Authenticated succesfully')
@@ -42,10 +60,10 @@ Publisher.prototype.upload = function upload (track, params, callback) {
       })
     },
 
-    function (done) {
+    function createEdit (done) {
       debug('> Creating edit')
       publisher.edits.insert({
-        packageName: params.packageName,
+        packageName: packageName,
         auth: self.client
       }, function (err, edit) {
         debug('> Created edit with id %d', edit.id)
@@ -54,30 +72,30 @@ Publisher.prototype.upload = function upload (track, params, callback) {
       })
     },
 
-    function (done) {
+    function uploadAPK (done) {
       debug('> Uploading release')
       publisher.edits.apks.upload({
-        packageName: params.packageName,
+        packageName: packageName,
         editId: editId,
         auth: self.client,
         media: {
           mimeType: 'application/vnd.android.package-archive',
-          body: fs.createReadStream(params.apk)
+          body: fs.createReadStream(apk)
         }
       }, function (err, upload) {
-        debug('> Uploaded %s with version code %d and SHA1 %s', params.apk, upload.versionCode, upload.binary.sha1)
+        debug('> Uploaded %s with version code %d and SHA1 %s', apk, upload.versionCode, upload.binary.sha1)
         done(err)
       })
     },
 
-    function (done) {
-      debug('> Assigning APK to %s track', track)
+    function assignTrack (done) {
+      debug('> Assigning APK to %s track', params.track)
       publisher.edits.tracks.update({
-        packageName: params.packageName,
+        packageName: packageName,
         editId: editId,
-        track: track,
+        track: params.track,
         resource: {
-          versionCodes: [params.versionCode]
+          versionCodes: [versionCode]
         },
         auth: self.client
       }, function (err, track) {
@@ -86,16 +104,16 @@ Publisher.prototype.upload = function upload (track, params, callback) {
       })
     },
 
-    function (done) {
+    function sendRecentChanges (done) {
       if (!params.recentChanges) return done()
       debug('> Adding what changed')
       async.eachSeries(Object.keys(params.recentChanges), function (lang, next) {
         var changes = params.recentChanges[lang]
         publisher.edits.apklistings.update({
-          apkVersionCode: params.versionCode,
+          apkVersionCode: versionCode,
           editId: editId,
           language: lang,
-          packageName: params.packageName,
+          packageName: packageName,
           resource: {
             recentChanges: changes
           },
@@ -109,11 +127,11 @@ Publisher.prototype.upload = function upload (track, params, callback) {
       })
     },
 
-    function (done) {
+    function commitChanges (done) {
       debug('> Commiting changes')
       publisher.edits.commit({
         editId: editId,
-        packageName: params.packageName,
+        packageName: packageName,
         auth: self.client
       }, function (err, commit) {
         debug('> Commited changes')

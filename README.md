@@ -35,13 +35,11 @@ var publisher = require('google-play-publisher')({
 })
 
 // track can be alpha, beta, production or rollout
-publisher.upload('alpha', {
-  apk: 'path/to/apk',
+publisher.upload('/path/to/apk', {
+  track: 'beta', // default beta
   recentChanges: {
     'en-US': 'changelog'
   },
-  packageName: 'com.your.package.Name',
-  versionCode: 1
 }, function (err) {
 })
 ```

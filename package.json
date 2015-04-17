@@ -18,7 +18,7 @@
     "apk"
   ],
   "author": "Jeduan Cornejo <jeduan@gmail.com>",
-  "license": "BSD",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/jeduan/google-play-publisher/issues"
   },

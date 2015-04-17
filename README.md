@@ -1,5 +1,12 @@
 # google-play-publisher
 
+[![npm][npm-image]][npm-url]
+[![js-standard-style][standard-image]](https://github.com/feross/standard)
+
+[standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat
+[npm-image]: https://img.shields.io/npm/v/google-play-publisher.svg?style=flat
+[npm-url]: https://npmjs.org/package/google-play-publisher
+
 Upload APKs to Google Play
 
 This package offers a streamlined way to publish packages in the Google Play Store
@@ -11,7 +18,7 @@ Installation
 
 ### Play Store setup
 
-First you have to create a Google Play API Access. To do that go to the 
+First you have to create a Google Play API Access. To do that go to the
 [Google Play Developer Console](https://play.google.com/apps/publish) and then
 with the account owner go to Settings -> API access and create a Google Play
 Android Developer project.
@@ -23,7 +30,11 @@ with a public key and the service email.
 Usage
 ---
 
-    google-play-publisher --track beta --auth api.json --changelog-en-us "some changes" /path/to/Package.apk
+    google-play-publisher --auth api.json --recent-changes "en-US=some changes" /path/to/Package.apk
+
+### Other options
+
+ - `--track` Specify track for this release. Can be alpha, beta, production or rollout. Default: beta
 
 Using the API
 ---
@@ -31,7 +42,7 @@ Using the API
 ```javascript
 var publisher = require('google-play-publisher')({
   client_email: '',
-  private_key: '', // either private key or pem
+  private_key: '', // either private key or pem contents
 })
 
 // track can be alpha, beta, production or rollout

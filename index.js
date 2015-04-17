@@ -12,8 +12,8 @@ function Publisher (options) {
     return new Publisher(options)
   }
   options = options || {}
-  assert(options.client_email, 'I require options.client_email')
-  assert(options.private_key, 'I require a private_key')
+  assert(options.client_email, 'Missing required parameter client_email')
+  assert(options.private_key, 'Missing required parameter private_key')
 
   this.client = new google.auth.JWT(
     options.client_email,

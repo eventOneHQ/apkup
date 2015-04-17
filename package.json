@@ -1,10 +1,11 @@
 {
   "name": "google-play-publisher",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Publish APKs to Google Play Store",
   "main": "index.js",
+  "bin": "cli.js",
   "scripts": {
-    "test": "npm test"
+    "test": "node_modules/.bin/standard && echo 'Coming!'"
   },
   "repository": {
     "type": "git",
@@ -28,5 +29,8 @@
     "googleapis": "^2.0.2",
     "node-apk-parser": "^0.2.3",
     "yargs": "^3.7.2"
+  },
+  "devDependencies": {
+    "standard": "^3.6.1"
   }
 }

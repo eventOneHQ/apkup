@@ -21,5 +21,11 @@
   "bugs": {
     "url": "https://github.com/jeduan/google-play-publisher/issues"
   },
-  "homepage": "https://github.com/jeduan/google-play-publisher"
+  "homepage": "https://github.com/jeduan/google-play-publisher",
+  "dependencies": {
+    "async": "^0.9.0",
+    "debug": "^2.1.3",
+    "googleapis": "^2.0.2",
+    "yargs": "^3.7.2"
+  }
 }

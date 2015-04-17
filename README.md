@@ -30,11 +30,14 @@ with a public key and the service email.
 Usage
 ---
 
-    google-play-publisher --auth api.json --recent-changes "en-US=some changes" /path/to/Package.apk
+    google-play-publisher \
+      --auth api.json \
+      --recent-changes "en-US=`cat changes.txt`" \
+      /path/to/Package.apk
 
 ### Other options
 
- - `--track` Specify track for this release. Can be alpha, beta, production or rollout. Default: beta
+ - `--track` Specify track for this release. Can be alpha, beta, production or rollout. Default: alpha
 
 Using the API
 ---
@@ -42,14 +45,15 @@ Using the API
 ```javascript
 var publisher = require('google-play-publisher')({
   client_email: '',
-  private_key: '', // either private key or pem contents
+  private_key: '',
 })
 
+var changes = fs.readFileSync('changes.txt')
 // track can be alpha, beta, production or rollout
 publisher.upload('/path/to/apk', {
-  track: 'beta', // default beta
+  track: 'beta', // default alpha
   recentChanges: {
-    'en-US': 'changelog'
+    'en-US': changes
   },
 }, function (err) {
 })

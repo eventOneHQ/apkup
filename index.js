@@ -28,7 +28,7 @@ Publisher.tracks = ['alpha', 'beta', 'production', 'rollout']
 Publisher.prototype.upload = function upload (apk, params, callback) {
   assert(apk, 'I require an APK route')
   params = params || {}
-  params.track = params.track || 'beta'
+  params.track = params.track || 'alpha'
   assert(Publisher.tracks.indexOf(params.track) !== -1, 'Unknown track')
 
   var self = this

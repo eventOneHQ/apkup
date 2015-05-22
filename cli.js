@@ -25,7 +25,8 @@ var assert = require('assert')
 
 var authJSON = JSON.parse(fs.readFileSync(argv.auth)) // assume a JSON
 var options = {
-  track: argv.track
+  track: argv.track,
+  obbs: argv._.slice(1)
 }
 
 if (argv.recentChanges) {

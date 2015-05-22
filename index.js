@@ -55,7 +55,7 @@ Publisher.prototype.upload = function upload (apk, params, callback) {
     function authenticate (done) {
       debug('> Authenticating')
       self.client.authorize(function (err) {
-        debug('> Authenticated succesfully')
+        if (!err) debug('> Authenticated succesfully')
         done(err)
       })
     },
@@ -66,8 +66,8 @@ Publisher.prototype.upload = function upload (apk, params, callback) {
         packageName: packageName,
         auth: self.client
       }, function (err, edit) {
-        debug('> Created edit with id %d', edit.id)
-        editId = edit.id
+        if (!err && edit) debug('> Created edit with id %d', edit.id)
+        if (edit) editId = edit.id
         done(err)
       })
     },
@@ -83,9 +83,36 @@ Publisher.prototype.upload = function upload (apk, params, callback) {
           body: fs.createReadStream(apk)
         }
       }, function (err, upload) {
-        debug('> Uploaded %s with version code %d and SHA1 %s', apk, upload.versionCode, upload.binary.sha1)
+        if (!err && upload) debug('> Uploaded %s with version code %d and SHA1 %s', apk, upload.versionCode, upload.binary.sha1)
         done(err)
       })
+    },
+
+    function uploadOBBs (done) {
+      if (!params.obbs || params.obbs.length === 0) return done()
+
+      debug('> Uploading %d expansion file(s)', params.obbs.length)
+
+      async.eachSeries(
+        params.obbs,
+        function (obb, done) {
+          publisher.edits.expansionfiles.upload({
+            packageName: packageName,
+            editId: editId,
+            apkVersionCode: versionCode,
+            expansionFileType: 'main',
+            auth: self.client,
+            media: {
+              mimeType: 'application/octet-stream',
+              body: fs.createReadStream(obb)
+            }
+          }, function (err) {
+            if (!err) debug('> Uploaded %s', obb)
+            done(err)
+          })
+        },
+        done
+      )
     },
 
     function assignTrack (done) {
@@ -99,7 +126,7 @@ Publisher.prototype.upload = function upload (apk, params, callback) {
         },
         auth: self.client
       }, function (err, track) {
-        debug('> Assigned APK to %s track', track.track)
+        if (!err && track) debug('> Assigned APK to %s track', track.track)
         done(err)
       })
     },
@@ -134,7 +161,7 @@ Publisher.prototype.upload = function upload (apk, params, callback) {
         packageName: packageName,
         auth: self.client
       }, function (err, commit) {
-        debug('> Commited changes')
+        if (!err) debug('> Commited changes')
         done(err)
       })
     }

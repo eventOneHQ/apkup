@@ -33,7 +33,9 @@ Usage
     google-play-publisher \
       --auth api.json \
       --recent-changes "en-US=`cat changes.txt`" \
-      /path/to/Package.apk
+      /path/to/Package.apk \
+      /path/to/Expansion.obb \  # optional
+      /path/to/Expansion2.obb   # optional
 
 ### Other options
 
@@ -52,6 +54,9 @@ var changes = fs.readFileSync('changes.txt')
 // track can be alpha, beta, production or rollout
 publisher.upload('/path/to/apk', {
   track: 'beta', // default alpha
+  obbs: [  // optional expansion files (max 2)
+    '/path/to/somefile.obb'
+  ],
   recentChanges: {
     'en-US': changes
   },

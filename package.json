@@ -3,7 +3,10 @@
   "version": "0.3.0",
   "description": "Publish APKs to Google Play Store",
   "main": "index.js",
-  "bin": "cli.js",
+  "bin": {
+    "google-play-publisher": "cli.js",
+    "playup": "cli.js"
+  },
   "scripts": {
     "test": "node_modules/.bin/standard && echo 'Coming!'"
   },

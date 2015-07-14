@@ -1,25 +1,23 @@
 import {createReadStream} from 'fs'
 import Debug from 'debug'
 import apkParser from 'node-apk-parser'
-import androidpublisher from 'googleapis'
+import {androidpublisher} from 'googleapis'
 import assert from 'assert'
 
 var debug = Debug('google-play-publisher')
 var publisher = androidpublisher('v2')
 
-Upload.tracks = ['alpha', 'beta', 'production', 'rollout']
-
 export default class Upload {
-  constructor (client, apk, {track = 'alpha', obbs, recentChanges}) {
+  constructor (client, apk, params = {track: 'alpha', obbs: [], recentChanges: {}}) {
     assert(client, 'I require a client')
     assert(apk, 'I require an APK route')
-    assert(Upload.tracks.indexOf(track) !== -1, 'Unknown track')
+    assert(Upload.tracks.indexOf(params.track) !== -1, 'Unknown track')
 
     this.client = client
     this.apk = apk
-    this.track = track
-    this.obbs = obbs
-    this.recentChanges = recentChanges
+    this.track = params.track
+    this.obbs = params.obbs
+    this.recentChanges = params.recentChanges
   }
 
   publish () {
@@ -36,7 +34,7 @@ export default class Upload {
 
   parseManifest () {
     // Wrapping in promise because apkParser throws in case of error
-    return Promise.resolve.then(() => {
+    return Promise.resolve().then(() => {
       var reader = apkParser.readFile(this.apk)
       var manifest = reader.readManifestSync()
       this.packageName = manifest.package
@@ -188,3 +186,5 @@ export default class Upload {
     })
   }
 }
+
+Upload.tracks = ['alpha', 'beta', 'production', 'rollout']

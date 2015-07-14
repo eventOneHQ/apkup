@@ -42,9 +42,8 @@ if (argv.recentChanges) {
 }
 
 var publisher = require('./lib')(authJSON)
-publisher.upload(argv._[0], options, function (err) {
-  if (err) {
-    console.error(err)
-    process.exit(1)
-  }
+publisher.upload(argv._[0], options)
+.catch(function (err) {
+  console.error(err)
+  process.exit(1)
 })

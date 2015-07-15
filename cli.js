@@ -44,6 +44,6 @@ if (argv.recentChanges) {
 var publisher = require('./lib')(authJSON)
 publisher.upload(argv._[0], options)
 .catch(function (err) {
-  console.error(err)
+  console.error(err.stack)
   process.exit(1)
 })

@@ -21,26 +21,26 @@ export default class Upload {
   }
 
   publish () {
-    return Promise.resolve()
-      .then(this.parseManifest)
-      .then(this.authenticate)
-      .then(this.createEdit)
-      .then(this.uploadAPK)
-      .then(this.uploadOBBs)
-      .then(this.assignTrack)
-      .then(this.sendRecentChanges)
-      .then(this.commitChanges)
+    return this.parseManifest()
+      .then(() => this.authenticate())
+      .then(() => this.createEdit())
+      .then(() => this.uploadAPK())
+      .then(() => this.uploadOBBs())
+      .then(() => this.assignTrack())
+      .then(() => this.sendRecentChanges())
+      .then(() => this.commitChanges())
   }
 
   parseManifest () {
+    debug('> Parsing manifest')
     // Wrapping in promise because apkParser throws in case of error
     return Promise.resolve().then(() => {
       var reader = apkParser.readFile(this.apk)
       var manifest = reader.readManifestSync()
       this.packageName = manifest.package
       this.versionCode = manifest.versionCode
-      debug('Detected package name %s', this.packageName)
-      debug('Detected version code %d', this.versionCode)
+      debug('> Detected package name %s', this.packageName)
+      debug('> Detected version code %d', this.versionCode)
     })
   }
 
@@ -82,7 +82,7 @@ export default class Upload {
           mimeType: 'application/vnd.android.package-archive',
           body: createReadStream(this.apk)
         }
-      }, function (err, upload) {
+      }, (err, upload) => {
         if (err) return reject(err)
         debug('> Uploaded %s with version code %d and SHA1 %s', this.apk, upload.versionCode, upload.binary.sha1)
         done()

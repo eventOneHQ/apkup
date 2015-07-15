@@ -9,6 +9,7 @@
   "scripts": {
     "prepublish": "npm run build && npm prune",
     "build": "babel src --modules common --out-dir lib",
+    "build-debug": "babel src --modules common --out-dir lib --source-maps inline",
     "watch": "babel src --watch --modules common --out-dir lib --source-maps true",
     "test": "standard && tap test/*.js"
   },

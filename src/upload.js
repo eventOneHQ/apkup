@@ -91,7 +91,7 @@ export default class Upload {
   }
 
   uploadOBBs () {
-    if (!this.obbs || !Array.isArray(this.obbs) || !this.obbs) return Promise.resolve()
+    if (!this.obbs || !Array.isArray(this.obbs) || !this.obbs.length) return Promise.resolve()
 
     debug('> Uploading %d expansion file(s)', this.obbs.length)
     let current = Promise.resolve()

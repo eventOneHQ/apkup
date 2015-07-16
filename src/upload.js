@@ -71,7 +71,7 @@ export default class Upload {
     })
   }
 
-  uploadAPK (done) {
+  uploadAPK () {
     debug('> Uploading release')
     return new Promise((done, reject) => {
       publisher.edits.apks.upload({
@@ -103,6 +103,7 @@ export default class Upload {
   }
 
   uploadOBB (obb) {
+    debug('Uploading expansion file %s', obb)
     return new Promise((resolve, reject) => {
       publisher.edits.expansionfiles.upload({
         packageName: this.packageName,

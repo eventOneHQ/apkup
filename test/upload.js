@@ -17,7 +17,7 @@ test('Upload should create with default options', function (t) {
   t.end()
 })
 
-test('Upload should assing package name from apk parser', function (t) {
+test('Upload should assign package name from apk parser', function (t) {
   var readManifestSync = sinon.stub().returns({
     package: defaultPackage,
     versionCode: 1
@@ -55,6 +55,23 @@ test('Upload should catch errors in apk parser', function (t) {
     })
 })
 
+test('Should authenticate', function (t) {
+  var spy = sinon.spy()
+  var Upload = require('../lib/upload')
+  var client = {authorize: spy}
+  var up = new Upload(client, defaultApk)
+  up.authenticate().then(onAuthenticate)
+
+  t.equal(spy.callCount, 1, 'Authenticate is called')
+  t.equal(typeof spy.firstCall.args[0], 'function')
+  spy.firstCall.args[0]()
+
+  function onAuthenticate () {
+    t.end()
+  }
+})
+
+
 test('Upload should set editId correctly', function (t) {
   var spy = sinon.spy()
   var androidpublisher = sinon.stub().returns({
@@ -80,4 +97,85 @@ test('Upload should set editId correctly', function (t) {
     t.equals(up.editId, 123, 'Sets up editId correctly')
     t.end()
   }
+})
+
+test('Upload should send the apk', function (t) {
+  var spy = sinon.spy()
+  var readStream = sinon.spy()
+  var androidpublisher = sinon.stub().returns({
+    edits: {
+      apks: {
+        upload: spy
+      }
+    }
+  })
+  var Upload = proxyquire('../lib/upload', {
+    'googleapis': {androidpublisher: androidpublisher},
+    'fs': {createReadStream: readStream}
+  })
+  var up = new Upload(defaultClient, defaultApk)
+  up.packageName = defaultPackage
+  up.editId = 123
+  up.uploadAPK().then(onUpload)
+
+  var callParams = spy.firstCall.args[0]
+  t.equal(typeof callParams, 'object')
+  t.equal(callParams.packageName, defaultPackage, 'Sets default package')
+  t.equal(callParams.editId, 123, 'Sets editId')
+  t.equal(callParams.auth, defaultClient)
+  t.equal(callParams.media.mimeType, 'application/vnd.android.package-archive', 'Sets MIME type')
+  t.equal(readStream.firstCall.args[0], defaultApk, 'Sends the APK')
+  t.equal(typeof spy.firstCall.args[1], 'function')
+  spy.firstCall.args[1](null, {version: 1, binary: {sha1: ''}})
+
+  function onUpload () {
+    t.end()
+  }
+})
+
+test('Should resolve a promise when there are no OBBs', function (t) {
+  var Upload = require('../lib/upload')
+  var up = new Upload(defaultClient, defaultApk)
+  up.uploadOBBs().then(function () {
+    t.end()
+  })
+})
+
+test('Should upload every OBB', function (t) {
+  var spy = sinon.spy()
+  var readStream = sinon.spy()
+  var androidpublisher = sinon.stub().returns({
+    edits: {
+      expansionfiles: {
+        upload: spy
+      }
+    }
+  })
+  var Upload = proxyquire('../lib/upload', {
+    'googleapis': {androidpublisher: androidpublisher},
+    'fs': {createReadStream: readStream}
+  })
+  var obbs = ['obb1', 'obb2', 'obb3']
+  var up = new Upload(defaultClient, defaultApk)
+  up.packageName = defaultPackage
+  up.editId = 123
+  up.versionCode = 1
+  up.obbs = obbs
+
+  up.uploadOBBs().then(function () {
+    t.end()
+  })
+
+  t.equal(typeof spy.firstCall.args[0], 'object')
+  t.equal(readStream.firstCall.args[0], obbs[0], 'First OBB uploaded')
+  t.equal(typeof spy.firstCall.args[1], 'function')
+  spy.firstCall.args[1]()
+
+  t.equal(readStream.secondCall.args[0], obbs[1], 'Second OBB uploaded')
+  t.equal(typeof spy.secondCall.args[1], 'function')
+  spy.secondCall.args[1]()
+
+  t.equal(readStream.thirdCall.args[0], obbs[2], 'Third OBB uploaded')
+  t.equal(typeof spy.thirdCall.args[1], 'function')
+  spy.thirdCall.args[1]()
 })

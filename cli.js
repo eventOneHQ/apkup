@@ -6,7 +6,7 @@ var argv = require('yargs')
   .option('t', {
     alias: 'track',
     type: 'string',
-    default: 'beta'
+    default: 'alpha'
   })
   .option('a', {
     alias: 'auth',
@@ -41,10 +41,9 @@ if (argv.recentChanges) {
   })
 }
 
-var publisher = require('./index')(authJSON)
-publisher.upload(argv._[0], options, function (err) {
-  if (err) {
-    console.error(err)
-    process.exit(1)
-  }
+var publisher = require('./lib')(authJSON)
+publisher.upload(argv._[0], options)
+.catch(function (err) {
+  console.error(err.stack)
+  process.exit(1)
 })

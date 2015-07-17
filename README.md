@@ -1,22 +1,53 @@
-# google-play-publisher
-
-[![npm][npm-image]][npm-url]
-[![js-standard-style][standard-image]](https://github.com/feross/standard)
+# playup [![Build Status](https://travis-ci.org/jeduan/playup.svg?branch=master)](https://travis-ci.org/jeduan/playup) [![npm][npm-image]][npm-url] [![js-standard-style][standard-image]](https://github.com/feross/standard)
 
 [standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat
-[npm-image]: https://img.shields.io/npm/v/google-play-publisher.svg?style=flat
-[npm-url]: https://npmjs.org/package/google-play-publisher
+[npm-image]: https://img.shields.io/npm/v/playup.svg?style=flat
+[npm-url]: https://npmjs.org/package/playup
 
-Upload APKs to Google Play
+ > Upload APKs to Google Play
 
 This package offers a streamlined way to publish packages in the Google Play Store
 
-Installation
----
+## Install
 
-`npm install -g google-play-publisher`
+```
+npm install -g playup
+```
 
-### Play Store setup
+## Usage
+
+Use the CLI
+
+```bash
+playup \
+  --auth api.json \
+  --recent-changes "en-US='lorem ipsum dolor'" \
+  /path/to/Package.apk \
+  /path/to/Expansion.obb \  # optional
+  /path/to/Expansion2.obb   # optional
+```
+
+or the JavaScript API
+
+```javascript
+var publisher = require('playup')({
+  client_email: '',
+  private_key: '',
+})
+
+publisher.upload('/path/to/apk', {
+  obbs: [  // optional expansion files (max 2)
+    '/path/to/somefile.obb'
+  ],
+  recentChanges: {
+    'en-US': 'lorem ipsum dolor'
+  },
+}).then(function (data) {
+  console.log(' > %s version %d is up!', data.packageName, data.versionCode)
+})
+```
+
+## Authentication
 
 First you have to create a Google Play API Access. To do that go to the
 [Google Play Developer Console](https://play.google.com/apps/publish) and then
@@ -27,39 +58,84 @@ After that follow the instructions to create a Service Account.
 When you click Create Client ID, choose Service Account. You will get a JSON file
 with a public key and the service email.
 
-Usage
----
+## gulp support
 
-    google-play-publisher \
-      --auth api.json \
-      --recent-changes "en-US=`cat changes.txt`" \
-      /path/to/Package.apk \
-      /path/to/Expansion.obb \  # optional
-      /path/to/Expansion2.obb   # optional
-
-### Other options
-
- - `--track` Specify track for this release. Can be alpha, beta, production or rollout. Default: alpha
-
-Using the API
----
+The `upload` method returns a `Promise` so this package can be used in conjunction with gulp with no extra plugins needed
 
 ```javascript
-var publisher = require('google-play-publisher')({
-  client_email: '',
-  private_key: '',
-})
-
-var changes = fs.readFileSync('changes.txt')
-// track can be alpha, beta, production or rollout
-publisher.upload('/path/to/apk', {
-  track: 'beta', // default alpha
-  obbs: [  // optional expansion files (max 2)
-    '/path/to/somefile.obb'
-  ],
-  recentChanges: {
-    'en-US': changes
-  },
-}, function (err) {
+gulp.task(upload, function () {
+  return publisher.upload(apk, params)
 })
 ```
+
+## API
+
+#### CLI
+  #### --auth
+
+  *Required*
+  Type: `File`
+
+  a JSON file with the [Authentication information](#authentication)
+
+  #### --recent-changes
+  *Required*
+  Type: `string`
+
+  A string with the format `lang=changes` where lang is the language code and changes the string that specifies the changes of this
+
+ #### --track
+ Type: `string`
+
+ Specify track for this release. Can be alpha, beta, production or rollout. Default: alpha
+
+#### JavaScript
+
+```
+var publisher = playup(auth)
+publisher.upload(apk, params[, callback])
+```
+
+#### auth
+
+*Required*
+Type: `object`
+
+The object with Authentication information. This object will have the following keys
+ - `client_email`
+ - `private_key`
+
+#### apk
+
+*Required*
+Type: `string`
+
+The path to the APK to upload
+
+#### params
+
+*Optional*
+Type: `object`
+
+The params object will add aditional information to this release. Currently, it can have these keys
+
+##### track
+
+ Type: string
+ Default: `'alpha'`
+
+ Specify track for this release. Can be alpha, beta, production or rollout.
+
+##### recentChanges
+
+ Type: object
+ Default: `{}`
+
+ An `object` that specifies changes in this version. Has the language code as key and the changes as value.
+
+##### obbs
+
+ Type: Array
+ Default: `[]`
+
+ An array that specifies the paths to the expansion files (OBBs) for this release

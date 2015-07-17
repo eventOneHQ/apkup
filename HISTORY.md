@@ -1,3 +1,7 @@
+1.0.0 (2015-07-16)
+
+  - Change name to playup
+
 0.3.0 (2015-05-22)
 
  - [@ronkorving](https://github.com/ronkorving) Support for .obb

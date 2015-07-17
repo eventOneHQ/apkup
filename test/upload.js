@@ -269,16 +269,3 @@ test('Should commit changes', function (t) {
   t.assert(typeof spy.firstCall.args[1] === 'function', 'Receives a callback')
   spy.firstCall.args[1]()
 })
-
-test('Should publish', function (t) {
-  var Upload = require('../lib/upload')
-  var up = new Upload(defaultClient, defaultApk)
-  up.packageName = defaultPackage
-  up.editId = 123
-
-
-
-  up.commitChanges().then(function () {
-    t.end()
-  })
-})

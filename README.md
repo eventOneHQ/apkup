@@ -73,33 +73,45 @@ gulp.task(upload, function () {
 })
 ```
 
-## API
+## CLI
 
-#### CLI
-  #### --auth
+### playup --auth auth --recent-changes "recent changes" APK [[OBB], OBB]
+
+  #### auth
 
   *Required*
   Type: `File`
 
   a JSON file with the [Authentication information](#authentication)
 
-  #### --recent-changes
+  #### recent-changes
   *Required*
   Type: `string`
 
   A string with the format `lang=changes` where lang is the language code and changes the string that specifies the changes of this
 
- #### --track
+ #### track
  Type: `string`
 
  Specify track for this release. Can be alpha, beta, production or rollout. Default: alpha
 
-#### JavaScript
+ #### APK
 
-```
-var publisher = playup(auth)
-publisher.upload(apk, params[, callback])
-```
+ The path to the APK
+
+ #### OBB
+
+ The path to 1 or more expansion files
+
+## API
+
+### Playup = require('playup')
+
+Playup is a constructor that can be called with or without `new`
+
+### publisher = new Playup(auth)
+
+The instance of Playup has the `auth` option
 
 #### auth
 
@@ -109,6 +121,10 @@ Type: `object`
 The object with Authentication information. This object will have the following keys
  - `client_email`
  - `private_key`
+
+### publisher.upload(apk[, params[, callback]])
+
+Upload specified APK. If no callback is specified, returns a `Promise`
 
 #### apk
 
@@ -144,3 +160,18 @@ The params object will add aditional information to this release. Currently, it 
  Default: `[]`
 
  An array that specifies the paths to the expansion files (OBBs) for this release
+
+#### callback
+
+ A function to be called when the process finishes. It receives two params:
+
+##### err
+
+The error if the upload was not succesful
+
+##### data
+
+An object with the following properties
+
+ - `packageName`
+ - `versionCode`

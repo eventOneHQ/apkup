@@ -71,7 +71,6 @@ test('Should authenticate', function (t) {
   }
 })
 
-
 test('Upload should set editId correctly', function (t) {
   var spy = sinon.spy()
   var androidpublisher = sinon.stub().returns({
@@ -178,4 +177,105 @@ test('Should upload every OBB', function (t) {
   t.equal(readStream.thirdCall.args[0], obbs[2], 'Third OBB uploaded')
   t.equal(typeof spy.thirdCall.args[1], 'function')
   spy.thirdCall.args[1]()
+})
+
+test('Should default to alpha track', function (t) {
+  var spy = sinon.spy()
+  var androidpublisher = sinon.stub().returns({
+    edits: {
+      tracks: {
+        update: spy
+      }
+    }
+  })
+  var Upload = proxyquire('../lib/upload', {
+    'googleapis': {androidpublisher: androidpublisher}
+  })
+  var up = new Upload(defaultClient, defaultApk)
+  up.assignTrack().then(function () {
+    t.end()
+  })
+
+  var args = spy.firstCall.args
+  t.equals(args[0].track, 'alpha')
+  t.equals(typeof args[1], 'function')
+  args[1](null, {track: 'alpha'})
+})
+
+test('Should upload recent changes', function (t) {
+  var spy = sinon.spy()
+  var androidpublisher = sinon.stub().returns({
+    edits: {
+      apklistings: {
+        update: spy
+      }
+    }
+  })
+  var Upload = proxyquire('../lib/upload', {
+    'googleapis': {androidpublisher: androidpublisher}
+  })
+  var changes = {
+    'en-US': 'lorem',
+    'es-MX': 'ipsum',
+    'jp': 'dolor'
+  }
+  var up = new Upload(defaultClient, defaultApk)
+  up.packageName = defaultPackage
+  up.editId = 123
+  up.versionCode = 1
+  up.recentChanges = changes
+
+  up.sendRecentChanges().then(function () {
+    t.end()
+  })
+
+  t.equal(typeof spy.firstCall.args[0], 'object')
+  t.equal(spy.firstCall.args[0].language, 'en-US', 'Sets language')
+  t.equal(spy.firstCall.args[0].resource.recentChanges, 'lorem', 'Sets language')
+  t.equal(typeof spy.firstCall.args[1], 'function')
+  spy.firstCall.args[1]()
+
+  t.equal(typeof spy.secondCall.args[1], 'function')
+  t.equal(spy.secondCall.args[0].language, 'es-MX', 'Sets language')
+  t.equal(spy.secondCall.args[0].resource.recentChanges, 'ipsum', 'Sets language')
+  spy.secondCall.args[1]()
+
+  t.equal(typeof spy.thirdCall.args[1], 'function')
+  t.equal(spy.thirdCall.args[0].language, 'jp', 'Sets language')
+  t.equal(spy.thirdCall.args[0].resource.recentChanges, 'dolor', 'Sets language')
+  spy.thirdCall.args[1]()
+})
+
+test('Should commit changes', function (t) {
+  var spy = sinon.spy()
+  var androidpublisher = sinon.stub().returns({
+    edits: {
+      commit: spy
+    }
+  })
+  var Upload = proxyquire('../lib/upload', {
+    'googleapis': {androidpublisher: androidpublisher}
+  })
+  var up = new Upload(defaultClient, defaultApk)
+  up.packageName = defaultPackage
+  up.editId = 123
+  up.commitChanges().then(function () {
+    t.end()
+  })
+  t.equal(spy.callCount, 1, 'Called one time')
+  t.equal(spy.firstCall.args[0].editId, 123, 'Sets the edit id')
+  t.equal(spy.firstCall.args[0].packageName, defaultPackage, 'Sets the package name')
+  t.equal(spy.firstCall.args[0].auth, defaultClient, 'Sets the package name')
+  t.assert(typeof spy.firstCall.args[1] === 'function', 'Receives a callback')
+  spy.firstCall.args[1]()
+})
+
+test('Should publish', function (t) {
+  var Upload = require('../lib/upload')
+  var up = new Upload(defaultClient, defaultApk)
+  up.packageName = defaultPackage
+  up.editId = 123
+  up.commitChanges().then(function () {
+    t.end()
+  })
 })

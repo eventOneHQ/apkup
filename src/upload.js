@@ -142,7 +142,7 @@ export default class Upload {
   }
 
   sendRecentChanges () {
-    if (!this.recentChanges) return Promise.resolve()
+    if (!this.recentChanges || !Object.keys(this.recentChanges).length) return Promise.resolve()
     debug('> Adding what changed')
 
     let current = Promise.resolve()

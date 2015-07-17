@@ -11,7 +11,8 @@
     "build": "babel src --modules common --out-dir lib",
     "build-debug": "babel src --modules common --out-dir lib --source-maps inline",
     "watch": "babel src --watch --modules common --out-dir lib --source-maps true",
-    "test": "standard && tap test/*.js"
+    "test": "standard && tap test/*.js",
+    "test-lcov": "standard &&  tap --coverage-report=lcov --coverage test/*.js"
   },
   "repository": {
     "type": "git",

@@ -275,6 +275,9 @@ test('Should publish', function (t) {
   var up = new Upload(defaultClient, defaultApk)
   up.packageName = defaultPackage
   up.editId = 123
+
+
+
   up.commitChanges().then(function () {
     t.end()
   })

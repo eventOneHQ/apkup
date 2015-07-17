@@ -29,6 +29,12 @@ export default class Upload {
       .then(() => this.assignTrack())
       .then(() => this.sendRecentChanges())
       .then(() => this.commitChanges())
+      .then(() => {
+        return {
+          packageName: this.packageName,
+          versionCode: this.versionCode
+        }
+      })
   }
 
   parseManifest () {

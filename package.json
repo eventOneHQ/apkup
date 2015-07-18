@@ -1,6 +1,6 @@
 {
   "name": "playup",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Publish APKs to Google Play Store",
   "main": "index.js",
   "bin": {

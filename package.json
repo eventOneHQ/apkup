@@ -2,7 +2,7 @@
   "name": "playup",
   "version": "1.0.1",
   "description": "Publish APKs to Google Play Store",
-  "main": "index.js",
+  "main": "lib/index.js",
   "bin": {
     "playup": "cli.js"
   },

@@ -14,7 +14,8 @@ export default class Upload {
     assert(Upload.tracks.indexOf(params.track) !== -1, 'Unknown track')
 
     this.client = client
-    this.apk = apk
+
+    this.apk = typeof apk === 'string' ? [apk] : apk
     this.track = params.track
     this.obbs = params.obbs
     this.recentChanges = params.recentChanges
@@ -41,7 +42,7 @@ export default class Upload {
     debug('> Parsing manifest')
     // Wrapping in promise because apkParser throws in case of error
     return Promise.resolve().then(() => {
-      var reader = apkParser.readFile(this.apk)
+      var reader = apkParser.readFile(this.apk[0])
       var manifest = reader.readManifestSync()
       this.packageName = manifest.package
       this.versionCode = manifest.versionCode
@@ -79,8 +80,7 @@ export default class Upload {
 
   uploadAPK () {
     debug('> Uploading release')
-    let apks = typeof this.apk === 'string' ? [this.apk] : this.apk;
-    const uploads = apks.map(function( apk ){
+    const uploads = this.apk.map(function( apk ){
       return new Promise((done, rejectApk) => {
         publisher.edits.apks.upload({
           packageName: this.packageName,

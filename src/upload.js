@@ -79,21 +79,25 @@ export default class Upload {
 
   uploadAPK () {
     debug('> Uploading release')
-    return new Promise((done, reject) => {
-      publisher.edits.apks.upload({
-        packageName: this.packageName,
-        editId: this.editId,
-        auth: this.client,
-        media: {
-          mimeType: 'application/vnd.android.package-archive',
-          body: createReadStream(this.apk)
-        }
-      }, (err, upload) => {
-        if (err) return reject(err)
-        debug('> Uploaded %s with version code %d and SHA1 %s', this.apk, upload.versionCode, upload.binary.sha1)
-        done()
-      })
-    })
+    let apks = typeof this.apk === 'string' ? [this.apk] : this.apk;
+    const uploads = apks.map(function( apk ){
+      return new Promise((done, rejectApk) => {
+        publisher.edits.apks.upload({
+          packageName: this.packageName,
+          editId: this.editId,
+          auth: this.client,
+          media: {
+            mimeType: 'application/vnd.android.package-archive',
+            body: createReadStream(apk)
+          }
+        }, (err, upload) => {
+          if (err) return reject(err)
+          debug('> Uploaded %s with version code %d and SHA1 %s', apk, upload.versionCode, upload.binary.sha1)
+          done()
+        })
+      });
+    });
+    return Promise.all(uploads);
   }
 
   uploadOBBs () {

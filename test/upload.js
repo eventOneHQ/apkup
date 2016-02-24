@@ -10,7 +10,7 @@ var defaultPackage = 'com.jeduan.test'
 test('Upload should create with default options', function (t) {
   var up = new Upload(defaultClient, defaultApk)
   t.equals(up.client, defaultClient, 'Sets client correctly')
-  t.equals(up.apk, defaultApk, 'Sets apk correctly')
+  t.deepEquals(up.apk, [defaultApk], 'Sets apk correctly')
   t.equals(up.track, 'alpha', 'Sets track correctly')
   t.equals(up.obbs.length, 0, 'Sets obbs correctly')
   t.equals(Object.keys(up.recentChanges).length, 0, 'Sets recent changes correctly')

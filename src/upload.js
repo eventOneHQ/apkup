@@ -6,7 +6,7 @@ import assert from 'assert'
 
 var debug = Debug('playup')
 var publisher = androidpublisher('v2')
-var versionCodes = [];
+var versionCodes = []
 
 export default class Upload {
   constructor (client, apk, params = {track: 'alpha', obbs: [], recentChanges: {}}) {
@@ -81,8 +81,8 @@ export default class Upload {
 
   uploadAPK () {
     debug('> Uploading release')
-    const that = this;
-    const uploads = this.apk.map(function( apk ){
+    const that = this
+    const uploads = this.apk.map(function (apk) {
       return new Promise((done, rejectApk) => {
         publisher.edits.apks.upload({
           packageName: that.packageName,
@@ -93,14 +93,14 @@ export default class Upload {
             body: createReadStream(apk)
           }
         }, (err, upload) => {
-          if (err) return reject(err)
+          if (err) return rejectApk(err)
           debug('> Uploaded %s with version code %d and SHA1 %s', apk, upload.versionCode, upload.binary.sha1)
-          versionCodes.push(upload.versionCode);
+          versionCodes.push(upload.versionCode)
           done()
         })
-      });
-    });
-    return Promise.all(uploads);
+      })
+    })
+    return Promise.all(uploads)
   }
 
   uploadOBBs () {

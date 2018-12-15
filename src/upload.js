@@ -58,18 +58,18 @@ export default class Upload {
 
   authenticate () {
     debug('> Authenticating')
-    return new Promise((done, reject) => {
+    return new Promise((resolve, reject) => {
       this.client.authorize(function (err) {
         if (err) return reject(err)
         debug('> Authenticated succesfully')
-        done()
+        resolve()
       })
     })
   }
 
   createEdit () {
     debug('> Creating edit')
-    return new Promise((done, reject) => {
+    return new Promise((resolve, reject) => {
       publisher.edits.insert(
         {
           packageName: this.packageName,
@@ -80,7 +80,7 @@ export default class Upload {
           if (!edit) return reject(new Error('Unable to create edit'))
           debug('> Created edit with id %d', edit.id)
           this.editId = edit.id
-          done()
+          resolve()
         }
       )
     })
@@ -90,7 +90,7 @@ export default class Upload {
     debug('> Uploading release')
     const that = this
     const uploads = this.apk.map(function (apk) {
-      return new Promise((done, rejectApk) => {
+      return new Promise((resolve, reject) => {
         publisher.edits.apks.upload(
           {
             packageName: that.packageName,
@@ -102,7 +102,7 @@ export default class Upload {
             }
           },
           (err, upload) => {
-            if (err) return rejectApk(err)
+            if (err) return reject(err)
             debug(
               '> Uploaded %s with version code %d and SHA1 %s',
               apk,
@@ -110,7 +110,7 @@ export default class Upload {
               upload.binary.sha1
             )
             versionCodes.push(upload.versionCode)
-            done()
+            resolve()
           }
         )
       })
@@ -195,7 +195,7 @@ export default class Upload {
   }
 
   sendRecentChange (lang) {
-    return new Promise((done, reject) => {
+    return new Promise((resolve, reject) => {
       var changes = this.recentChanges[lang]
       publisher.edits.apklistings.update(
         {
@@ -211,7 +211,7 @@ export default class Upload {
         (err, edit) => {
           if (err) return reject(err)
           debug('> Added recent changes for %s', lang)
-          done()
+          resolve()
         }
       )
     })
@@ -219,7 +219,7 @@ export default class Upload {
 
   commitChanges () {
     debug('> Commiting changes')
-    return new Promise((done, reject) => {
+    return new Promise((resolve, reject) => {
       publisher.edits.commit(
         {
           editId: this.editId,
@@ -229,7 +229,7 @@ export default class Upload {
         function (err, commit) {
           if (err) return reject(err)
           debug('> Commited changes')
-          done()
+          resolve()
         }
       )
     })

@@ -29,15 +29,15 @@ Use the CLI
 apkup \
   --auth api.json \
   --recent-changes "en-US='lorem ipsum dolor'" \
-  /path/to/Package.apk \
-  /path/to/Expansion.obb \  # optional
-  /path/to/Expansion2.obb   # optional
+  --file /path/to/Package.apk \
+  --obbs /path/to/Expansion.obb \  # optional
+  --obbs /path/to/Expansion2.obb   # optional
 ```
 
 or the JavaScript API
 
 ```javascript
-var publisher = require('apkup')({
+const publisher = require('apkup')({
   client_email: '',
   private_key: ''
 })
@@ -52,7 +52,7 @@ publisher
       'en-US': 'lorem ipsum dolor'
     }
   })
-  .then(function(data) {
+  .then(data => {
     console.log(' > %s version %d is up!', data.packageName, data.versionCode)
   })
 ```
@@ -73,14 +73,14 @@ with a public key and the service email.
 The `upload` method returns a `Promise` so this package can be used in conjunction with gulp with no extra plugins needed
 
 ```javascript
-gulp.task(upload, function() {
+gulp.task(upload, () => {
   return publisher.upload(apk, params)
 })
 ```
 
 ## CLI
 
-### apkup --auth auth --recent-changes "recent changes" APK [[OBB], OBB]
+### apkup --auth auth.json --recent-changes "recent changes" --file app.apk --obbs [OBB]
 
 #### auth
 

@@ -13,7 +13,11 @@ test('Upload should create with default options', function (t) {
   t.deepEquals(up.apk, [defaultApk], 'Sets apk correctly')
   t.equals(up.track, 'alpha', 'Sets track correctly')
   t.equals(up.obbs.length, 0, 'Sets obbs correctly')
-  t.equals(Object.keys(up.recentChanges).length, 0, 'Sets recent changes correctly')
+  t.equals(
+    Object.keys(up.recentChanges).length,
+    0,
+    'Sets recent changes correctly'
+  )
   t.end()
 })
 
@@ -26,7 +30,7 @@ test('Upload should assign package name from apk parser', function (t) {
     readManifestSync: readManifestSync
   })
   var Upload = proxyquire('../lib/upload', {
-    'node-apk-parser': {readFile: readFile}
+    'node-apk-parser': { readFile: readFile }
   })
   var up = new Upload(defaultClient, defaultApk)
   up.parseManifest()
@@ -45,20 +49,19 @@ test('Upload should assign package name from apk parser', function (t) {
 test('Upload should catch errors in apk parser', function (t) {
   var readFile = sinon.stub().throws()
   var Upload = proxyquire('../lib/upload', {
-    'node-apk-parser': {readFile: readFile}
+    'node-apk-parser': { readFile: readFile }
   })
   var up = new Upload(defaultClient, defaultApk)
-  up.parseManifest()
-    .catch(function (err) {
-      t.ok(err instanceof Error, 'Thrown an error')
-      t.end()
-    })
+  up.parseManifest().catch(function (err) {
+    t.ok(err instanceof Error, 'Thrown an error')
+    t.end()
+  })
 })
 
 test('Should authenticate', function (t) {
   var spy = sinon.spy()
   var Upload = require('../lib/upload')
-  var client = {authorize: spy}
+  var client = { authorize: spy }
   var up = new Upload(client, defaultApk)
   up.authenticate().then(onAuthenticate)
 
@@ -79,7 +82,7 @@ test('Upload should set editId correctly', function (t) {
     }
   })
   var Upload = proxyquire('../lib/upload', {
-    'googleapis': {androidpublisher: androidpublisher}
+    googleapis: { androidpublisher: androidpublisher }
   })
   var up = new Upload(defaultClient, defaultApk)
   up.packageName = defaultPackage
@@ -90,7 +93,7 @@ test('Upload should set editId correctly', function (t) {
   t.equal(callParams.packageName, defaultPackage)
   t.equal(callParams.auth, defaultClient)
   t.equal(typeof spy.firstCall.args[1], 'function')
-  spy.firstCall.args[1](null, {id: 123})
+  spy.firstCall.args[1](null, { id: 123 })
 
   function onEdit () {
     t.equals(up.editId, 123, 'Sets up editId correctly')
@@ -109,8 +112,8 @@ test('Upload should send the apk', function (t) {
     }
   })
   var Upload = proxyquire('../lib/upload', {
-    'googleapis': {androidpublisher: androidpublisher},
-    'fs': {createReadStream: readStream}
+    googleapis: { androidpublisher: androidpublisher },
+    fs: { createReadStream: readStream }
   })
   var up = new Upload(defaultClient, defaultApk)
   up.packageName = defaultPackage
@@ -122,10 +125,14 @@ test('Upload should send the apk', function (t) {
   t.equal(callParams.packageName, defaultPackage, 'Sets default package')
   t.equal(callParams.editId, 123, 'Sets editId')
   t.equal(callParams.auth, defaultClient)
-  t.equal(callParams.media.mimeType, 'application/vnd.android.package-archive', 'Sets MIME type')
+  t.equal(
+    callParams.media.mimeType,
+    'application/vnd.android.package-archive',
+    'Sets MIME type'
+  )
   t.equal(readStream.firstCall.args[0], defaultApk, 'Sends the APK')
   t.equal(typeof spy.firstCall.args[1], 'function')
-  spy.firstCall.args[1](null, {version: 1, binary: {sha1: ''}})
+  spy.firstCall.args[1](null, { version: 1, binary: { sha1: '' } })
 
   function onUpload () {
     t.end()
@@ -151,8 +158,8 @@ test('Should upload every OBB', function (t) {
     }
   })
   var Upload = proxyquire('../lib/upload', {
-    'googleapis': {androidpublisher: androidpublisher},
-    'fs': {createReadStream: readStream}
+    googleapis: { androidpublisher: androidpublisher },
+    fs: { createReadStream: readStream }
   })
   var obbs = ['obb1', 'obb2', 'obb3']
   var up = new Upload(defaultClient, defaultApk)
@@ -189,7 +196,7 @@ test('Should default to alpha track', function (t) {
     }
   })
   var Upload = proxyquire('../lib/upload', {
-    'googleapis': {androidpublisher: androidpublisher}
+    googleapis: { androidpublisher: androidpublisher }
   })
   var up = new Upload(defaultClient, defaultApk)
   up.assignTrack().then(function () {
@@ -199,7 +206,7 @@ test('Should default to alpha track', function (t) {
   var args = spy.firstCall.args
   t.equals(args[0].track, 'alpha')
   t.equals(typeof args[1], 'function')
-  args[1](null, {track: 'alpha'})
+  args[1](null, { track: 'alpha' })
 })
 
 test('Should upload recent changes', function (t) {
@@ -212,12 +219,12 @@ test('Should upload recent changes', function (t) {
     }
   })
   var Upload = proxyquire('../lib/upload', {
-    'googleapis': {androidpublisher: androidpublisher}
+    googleapis: { androidpublisher: androidpublisher }
   })
   var changes = {
     'en-US': 'lorem',
     'es-MX': 'ipsum',
-    'jp': 'dolor'
+    jp: 'dolor'
   }
   var up = new Upload(defaultClient, defaultApk)
   up.packageName = defaultPackage
@@ -231,18 +238,30 @@ test('Should upload recent changes', function (t) {
 
   t.equal(typeof spy.firstCall.args[0], 'object')
   t.equal(spy.firstCall.args[0].language, 'en-US', 'Sets language')
-  t.equal(spy.firstCall.args[0].resource.recentChanges, 'lorem', 'Sets language')
+  t.equal(
+    spy.firstCall.args[0].resource.recentChanges,
+    'lorem',
+    'Sets language'
+  )
   t.equal(typeof spy.firstCall.args[1], 'function')
   spy.firstCall.args[1]()
 
   t.equal(typeof spy.secondCall.args[1], 'function')
   t.equal(spy.secondCall.args[0].language, 'es-MX', 'Sets language')
-  t.equal(spy.secondCall.args[0].resource.recentChanges, 'ipsum', 'Sets language')
+  t.equal(
+    spy.secondCall.args[0].resource.recentChanges,
+    'ipsum',
+    'Sets language'
+  )
   spy.secondCall.args[1]()
 
   t.equal(typeof spy.thirdCall.args[1], 'function')
   t.equal(spy.thirdCall.args[0].language, 'jp', 'Sets language')
-  t.equal(spy.thirdCall.args[0].resource.recentChanges, 'dolor', 'Sets language')
+  t.equal(
+    spy.thirdCall.args[0].resource.recentChanges,
+    'dolor',
+    'Sets language'
+  )
   spy.thirdCall.args[1]()
 })
 
@@ -254,7 +273,7 @@ test('Should commit changes', function (t) {
     }
   })
   var Upload = proxyquire('../lib/upload', {
-    'googleapis': {androidpublisher: androidpublisher}
+    googleapis: { androidpublisher: androidpublisher }
   })
   var up = new Upload(defaultClient, defaultApk)
   up.packageName = defaultPackage
@@ -264,7 +283,11 @@ test('Should commit changes', function (t) {
   })
   t.equal(spy.callCount, 1, 'Called one time')
   t.equal(spy.firstCall.args[0].editId, 123, 'Sets the edit id')
-  t.equal(spy.firstCall.args[0].packageName, defaultPackage, 'Sets the package name')
+  t.equal(
+    spy.firstCall.args[0].packageName,
+    defaultPackage,
+    'Sets the package name'
+  )
   t.equal(spy.firstCall.args[0].auth, defaultClient, 'Sets the package name')
   t.assert(typeof spy.firstCall.args[1] === 'function', 'Receives a callback')
   spy.firstCall.args[1]()

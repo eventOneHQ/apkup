@@ -8,13 +8,13 @@ test('asks for options', function (t) {
     Publisher()
   })
   t.throws(function () {
-    Publisher({client_email: 'foo'})
+    Publisher({ client_email: 'foo' })
   })
   t.throws(function () {
-    Publisher({private_key: 'foo'})
+    Publisher({ private_key: 'foo' })
   })
   t.doesNotThrow(function () {
-    Publisher({client_email: 'foo', private_key: 'bar'})
+    Publisher({ client_email: 'foo', private_key: 'bar' })
   })
   t.end()
 })
@@ -30,7 +30,7 @@ test('Calls Upload with the right params', function (t) {
     './upload': upload
   })
 
-  var client = {client_email: 'foo', private_key: 'bar'}
+  var client = { client_email: 'foo', private_key: 'bar' }
   var params = {}
   var p = Publisher(client)
 

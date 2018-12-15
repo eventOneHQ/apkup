@@ -17,8 +17,7 @@ var argv = require('yargs')
     alias: 'recent-changes',
     type: 'array'
   })
-  .help('h')
-  .argv
+  .help('h').argv
 
 var fs = require('fs')
 var assert = require('assert')
@@ -42,8 +41,7 @@ if (argv.recentChanges) {
 }
 
 var publisher = require('./lib')(authJSON)
-publisher.upload(argv._[0], options)
-.catch(function (err) {
+publisher.upload(argv._[0], options).catch(function (err) {
   console.error(err.stack)
   process.exit(1)
 })

@@ -2,7 +2,6 @@
 
 var argv = require('yargs')
   .usage('Usage: $0 [options]')
-  .demand(1)
   .option('t', {
     alias: 'track',
     type: 'string',
@@ -11,10 +10,20 @@ var argv = require('yargs')
   .option('a', {
     alias: 'auth',
     describe: 'JSON file that contains private key and client email',
-    demand: true
+    demandOption: true
   })
   .option('r', {
     alias: 'recent-changes',
+    type: 'array'
+  })
+  .option('f', {
+    alias: 'file',
+    describe: 'APK files',
+    demandOption: true
+  })
+  .option('o', {
+    alias: 'obbs',
+    describe: 'Optional expansion files (max 2)',
     type: 'array'
   })
   .help('h').argv
@@ -25,16 +34,20 @@ var assert = require('assert')
 var authJSON = JSON.parse(fs.readFileSync(argv.auth)) // assume a JSON
 var options = {
   track: argv.track,
-  obbs: argv._.slice(1)
+  obbs: argv.obbs
 }
 
 if (argv.recentChanges) {
   options.recentChanges = {}
   argv.recentChanges.forEach(function (change) {
-    assert.notEqual(change.indexOf('='), -1, 'Unable to parse recent changes')
+    assert.notStrictEqual(
+      change.indexOf('='),
+      -1,
+      'Unable to parse recent changes'
+    )
 
     var parts = change.split('=')
-    assert.equal(parts.length, 2, 'Unable to parse recent changes')
+    assert.strictEqual(parts.length, 2, 'Unable to parse recent changes')
 
     options.recentChanges[parts[0]] = parts[1]
   })

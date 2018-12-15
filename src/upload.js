@@ -4,7 +4,7 @@ import apkParser from 'node-apk-parser'
 import {androidpublisher} from 'googleapis'
 import assert from 'assert'
 
-var debug = Debug('playup')
+var debug = Debug('apkup')
 var publisher = androidpublisher('v2')
 var versionCodes = []
 

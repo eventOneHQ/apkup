@@ -1,14 +1,14 @@
-var test = require('tape')
-var proxyquire = require('proxyquire')
-var sinon = require('sinon')
-var Upload = require('../lib/upload')
+const test = require('tape')
+const proxyquire = require('proxyquire')
+const sinon = require('sinon')
+const Upload = require('../lib/upload')
 
-var defaultClient = {}
-var defaultApk = '/path/to/apk'
-var defaultPackage = 'com.jeduan.test'
+const defaultClient = {}
+const defaultApk = '/path/to/apk'
+const defaultPackage = 'com.jeduan.test'
 
 test('Upload should create with default options', function (t) {
-  var up = new Upload(defaultClient, defaultApk)
+  const up = new Upload(defaultClient, defaultApk)
   t.equals(up.client, defaultClient, 'Sets client correctly')
   t.deepEquals(up.apk, [defaultApk], 'Sets apk correctly')
   t.equals(up.track, 'alpha', 'Sets track correctly')
@@ -22,17 +22,17 @@ test('Upload should create with default options', function (t) {
 })
 
 test('Upload should assign package name from apk parser', function (t) {
-  var readManifestSync = sinon.stub().returns({
+  const readManifestSync = sinon.stub().returns({
     package: defaultPackage,
     versionCode: 1
   })
-  var readFile = sinon.stub().returns({
+  const readFile = sinon.stub().returns({
     readManifestSync: readManifestSync
   })
-  var Upload = proxyquire('../lib/upload', {
+  const Upload = proxyquire('../lib/upload', {
     'node-apk-parser': { readFile: readFile }
   })
-  var up = new Upload(defaultClient, defaultApk)
+  const up = new Upload(defaultClient, defaultApk)
   up.parseManifest()
     .then(function () {
       t.equals(up.packageName, defaultPackage, 'Sets package name correctly')
@@ -47,11 +47,11 @@ test('Upload should assign package name from apk parser', function (t) {
 })
 
 test('Upload should catch errors in apk parser', function (t) {
-  var readFile = sinon.stub().throws()
-  var Upload = proxyquire('../lib/upload', {
+  const readFile = sinon.stub().throws()
+  const Upload = proxyquire('../lib/upload', {
     'node-apk-parser': { readFile: readFile }
   })
-  var up = new Upload(defaultClient, defaultApk)
+  const up = new Upload(defaultClient, defaultApk)
   up.parseManifest().catch(function (err) {
     t.ok(err instanceof Error, 'Thrown an error')
     t.end()
@@ -59,10 +59,10 @@ test('Upload should catch errors in apk parser', function (t) {
 })
 
 test('Should authenticate', function (t) {
-  var spy = sinon.spy()
-  var Upload = require('../lib/upload')
-  var client = { authorize: spy }
-  var up = new Upload(client, defaultApk)
+  const spy = sinon.spy()
+  const Upload = require('../lib/upload')
+  const client = { authorize: spy }
+  const up = new Upload(client, defaultApk)
   up.authenticate().then(onAuthenticate)
 
   t.equal(spy.callCount, 1, 'Authenticate is called')
@@ -75,20 +75,20 @@ test('Should authenticate', function (t) {
 })
 
 test('Upload should set editId correctly', function (t) {
-  var spy = sinon.spy()
-  var androidpublisher = sinon.stub().returns({
+  const spy = sinon.spy()
+  const androidpublisher = sinon.stub().returns({
     edits: {
       insert: spy
     }
   })
-  var Upload = proxyquire('../lib/upload', {
+  const Upload = proxyquire('../lib/upload', {
     googleapis: { androidpublisher: androidpublisher }
   })
-  var up = new Upload(defaultClient, defaultApk)
+  const up = new Upload(defaultClient, defaultApk)
   up.packageName = defaultPackage
   up.createEdit().then(onEdit)
 
-  var callParams = spy.firstCall.args[0]
+  const callParams = spy.firstCall.args[0]
   t.equal(typeof callParams, 'object')
   t.equal(callParams.packageName, defaultPackage)
   t.equal(callParams.auth, defaultClient)
@@ -102,25 +102,25 @@ test('Upload should set editId correctly', function (t) {
 })
 
 test('Upload should send the apk', function (t) {
-  var spy = sinon.spy()
-  var readStream = sinon.spy()
-  var androidpublisher = sinon.stub().returns({
+  const spy = sinon.spy()
+  const readStream = sinon.spy()
+  const androidpublisher = sinon.stub().returns({
     edits: {
       apks: {
         upload: spy
       }
     }
   })
-  var Upload = proxyquire('../lib/upload', {
+  const Upload = proxyquire('../lib/upload', {
     googleapis: { androidpublisher: androidpublisher },
     fs: { createReadStream: readStream }
   })
-  var up = new Upload(defaultClient, defaultApk)
+  const up = new Upload(defaultClient, defaultApk)
   up.packageName = defaultPackage
   up.editId = 123
   up.uploadAPK().then(onUpload)
 
-  var callParams = spy.firstCall.args[0]
+  const callParams = spy.firstCall.args[0]
   t.equal(typeof callParams, 'object')
   t.equal(callParams.packageName, defaultPackage, 'Sets default package')
   t.equal(callParams.editId, 123, 'Sets editId')
@@ -140,29 +140,29 @@ test('Upload should send the apk', function (t) {
 })
 
 test('Should resolve a promise when there are no OBBs', function (t) {
-  var Upload = require('../lib/upload')
-  var up = new Upload(defaultClient, defaultApk)
+  const Upload = require('../lib/upload')
+  const up = new Upload(defaultClient, defaultApk)
   up.uploadOBBs().then(function () {
     t.end()
   })
 })
 
 test('Should upload every OBB', function (t) {
-  var spy = sinon.spy()
-  var readStream = sinon.spy()
-  var androidpublisher = sinon.stub().returns({
+  const spy = sinon.spy()
+  const readStream = sinon.spy()
+  const androidpublisher = sinon.stub().returns({
     edits: {
       expansionfiles: {
         upload: spy
       }
     }
   })
-  var Upload = proxyquire('../lib/upload', {
+  const Upload = proxyquire('../lib/upload', {
     googleapis: { androidpublisher: androidpublisher },
     fs: { createReadStream: readStream }
   })
-  var obbs = ['obb1', 'obb2', 'obb3']
-  var up = new Upload(defaultClient, defaultApk)
+  const obbs = ['obb1', 'obb2', 'obb3']
+  const up = new Upload(defaultClient, defaultApk)
   up.packageName = defaultPackage
   up.editId = 123
   up.versionCode = 1
@@ -187,46 +187,46 @@ test('Should upload every OBB', function (t) {
 })
 
 test('Should default to alpha track', function (t) {
-  var spy = sinon.spy()
-  var androidpublisher = sinon.stub().returns({
+  const spy = sinon.spy()
+  const androidpublisher = sinon.stub().returns({
     edits: {
       tracks: {
         update: spy
       }
     }
   })
-  var Upload = proxyquire('../lib/upload', {
+  const Upload = proxyquire('../lib/upload', {
     googleapis: { androidpublisher: androidpublisher }
   })
-  var up = new Upload(defaultClient, defaultApk)
+  const up = new Upload(defaultClient, defaultApk)
   up.assignTrack().then(function () {
     t.end()
   })
 
-  var args = spy.firstCall.args
+  const args = spy.firstCall.args
   t.equals(args[0].track, 'alpha')
   t.equals(typeof args[1], 'function')
   args[1](null, { track: 'alpha' })
 })
 
 test('Should upload recent changes', function (t) {
-  var spy = sinon.spy()
-  var androidpublisher = sinon.stub().returns({
+  const spy = sinon.spy()
+  const androidpublisher = sinon.stub().returns({
     edits: {
       apklistings: {
         update: spy
       }
     }
   })
-  var Upload = proxyquire('../lib/upload', {
+  const Upload = proxyquire('../lib/upload', {
     googleapis: { androidpublisher: androidpublisher }
   })
-  var changes = {
+  const changes = {
     'en-US': 'lorem',
     'es-MX': 'ipsum',
     jp: 'dolor'
   }
-  var up = new Upload(defaultClient, defaultApk)
+  const up = new Upload(defaultClient, defaultApk)
   up.packageName = defaultPackage
   up.editId = 123
   up.versionCode = 1
@@ -266,16 +266,16 @@ test('Should upload recent changes', function (t) {
 })
 
 test('Should commit changes', function (t) {
-  var spy = sinon.spy()
-  var androidpublisher = sinon.stub().returns({
+  const spy = sinon.spy()
+  const androidpublisher = sinon.stub().returns({
     edits: {
       commit: spy
     }
   })
-  var Upload = proxyquire('../lib/upload', {
+  const Upload = proxyquire('../lib/upload', {
     googleapis: { androidpublisher: androidpublisher }
   })
-  var up = new Upload(defaultClient, defaultApk)
+  const up = new Upload(defaultClient, defaultApk)
   up.packageName = defaultPackage
   up.editId = 123
   up.commitChanges().then(function () {

@@ -1,6 +1,12 @@
 #!/usr/bin/env node
 
-var argv = require('yargs')
+const fs = require('fs')
+const assert = require('assert')
+const yargs = require('yargs')
+
+const Apkup = require('./lib')
+
+const argv = yargs
   .usage('Usage: $0 [options]')
   .option('t', {
     alias: 'track',
@@ -28,33 +34,30 @@ var argv = require('yargs')
   })
   .help('h').argv
 
-var fs = require('fs')
-var assert = require('assert')
-
-var authJSON = JSON.parse(fs.readFileSync(argv.auth)) // assume a JSON
-var options = {
+const authJSON = JSON.parse(fs.readFileSync(argv.auth)) // assume a JSON
+const options = {
   track: argv.track,
   obbs: argv.obbs
 }
 
 if (argv.recentChanges) {
   options.recentChanges = {}
-  argv.recentChanges.forEach(function (change) {
+  argv.recentChanges.forEach(change => {
     assert.notStrictEqual(
       change.indexOf('='),
       -1,
       'Unable to parse recent changes'
     )
 
-    var parts = change.split('=')
+    const parts = change.split('=')
     assert.strictEqual(parts.length, 2, 'Unable to parse recent changes')
 
     options.recentChanges[parts[0]] = parts[1]
   })
 }
 
-var publisher = require('./lib')(authJSON)
-publisher.upload(argv._[0], options).catch(function (err) {
+const publisher = Apkup(authJSON)
+publisher.upload(argv.file, options).catch(err => {
   console.error(err.stack)
   process.exit(1)
 })

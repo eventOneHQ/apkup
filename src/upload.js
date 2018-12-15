@@ -4,9 +4,9 @@ import apkParser from 'node-apk-parser'
 import { androidpublisher } from 'googleapis'
 import assert from 'assert'
 
-var debug = Debug('apkup')
-var publisher = androidpublisher('v2')
-var versionCodes = []
+const debug = Debug('apkup')
+const publisher = androidpublisher('v2')
+const versionCodes = []
 
 export default class Upload {
   constructor (
@@ -47,8 +47,8 @@ export default class Upload {
     debug('> Parsing manifest')
     // Wrapping in promise because apkParser throws in case of error
     return Promise.resolve().then(() => {
-      var reader = apkParser.readFile(this.apk[0])
-      var manifest = reader.readManifestSync()
+      const reader = apkParser.readFile(this.apk[0])
+      const manifest = reader.readManifestSync()
       this.packageName = manifest.package
       this.versionCode = manifest.versionCode
       debug('> Detected package name %s', this.packageName)
@@ -59,7 +59,7 @@ export default class Upload {
   authenticate () {
     debug('> Authenticating')
     return new Promise((resolve, reject) => {
-      this.client.authorize(function (err) {
+      this.client.authorize(err => {
         if (err) return reject(err)
         debug('> Authenticated succesfully')
         resolve()
@@ -89,7 +89,7 @@ export default class Upload {
   uploadAPK () {
     debug('> Uploading release')
     const that = this
-    const uploads = this.apk.map(function (apk) {
+    const uploads = this.apk.map(apk => {
       return new Promise((resolve, reject) => {
         publisher.edits.apks.upload(
           {
@@ -170,7 +170,7 @@ export default class Upload {
           },
           auth: this.client
         },
-        function (err, track) {
+        (err, track) => {
           if (err) return reject(err)
           debug('> Assigned APK to %s track', track.track)
           resolve()
@@ -196,7 +196,7 @@ export default class Upload {
 
   sendRecentChange (lang) {
     return new Promise((resolve, reject) => {
-      var changes = this.recentChanges[lang]
+      const changes = this.recentChanges[lang]
       publisher.edits.apklistings.update(
         {
           apkVersionCode: this.versionCode,
@@ -226,7 +226,7 @@ export default class Upload {
           packageName: this.packageName,
           auth: this.client
         },
-        function (err, commit) {
+        (err, commit) => {
           if (err) return reject(err)
           debug('> Commited changes')
           resolve()

@@ -1,13 +1,13 @@
 # apkup [![Build Status][travis-image]][travis-url] [![Coverage Status][coveralls-image]][coveralls-url] [![npm][npm-image]][npm-url] [![js-standard-style][standard-image]][standard-url]
 
-[travis-image]: https://travis-ci.org/filiosoft/apkup.svg?branch=master
-[travis-url]: https://travis-ci.org/filiosoft/apkup
+[travis-image]: https://travis-ci.org/Filiosoft/apkup.svg?branch=master
+[travis-url]: https://travis-ci.org/Filiosoft/apkup
 [coveralls-image]: https://coveralls.io/repos/filiosoft/apkup/badge.svg?branch=master&service=github
 [coveralls-url]: https://coveralls.io/github/filiosoft/apkup?branch=master
 [npm-image]: https://img.shields.io/npm/v/apkup.svg?style=flat
 [npm-url]: https://npmjs.org/package/apkup
-[standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat
-[standard-url]: https://github.com/feross/standard
+[standard-image]: https://img.shields.io/badge/code_style-standard-brightgreen.svg
+[standard-url]: https://standardjs.com
 
 > Upload APKs to Google Play
 

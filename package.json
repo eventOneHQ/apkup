@@ -12,7 +12,8 @@
     "build-debug": "babel src --modules common --out-dir lib --source-maps inline",
     "watch": "babel src --watch --modules common --out-dir lib --source-maps true",
     "test": "eslint . && tap test/*.js",
-    "test-lcov": "eslint . &&  tap --coverage-report=lcov --coverage test/*.js"
+    "test-lcov": "eslint . &&  tap --coverage-report=lcov --coverage test/*.js",
+    "test:audit": "npm audit --json | npm-audit-html --output reports/audit.html && npm audit"
   },
   "repository": {
     "type": "git",
@@ -47,6 +48,7 @@
     "eslint-plugin-node": "^8.0.0",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
+    "npm-audit-html": "^1.2.0",
     "proxyquire": "^1.6.0",
     "sinon": "^1.15.4",
     "tap": "^1.3.1",

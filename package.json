@@ -7,10 +7,10 @@
     "apkup": "cli.js"
   },
   "scripts": {
-    "prepublish": "npm run build && npm prune",
-    "build": "babel src --modules common --out-dir lib",
-    "build-debug": "babel src --modules common --out-dir lib --source-maps inline",
-    "watch": "babel src --watch --modules common --out-dir lib --source-maps true",
+    "prepublishOnly": "npm run build && npm prune",
+    "build": "babel src --out-dir lib",
+    "build-debug": "babel src --out-dir lib --source-maps inline",
+    "watch": "babel src --watch --out-dir lib --source-maps true",
     "test": "eslint . && tap test/*.js",
     "test-lcov": "eslint . &&  tap --coverage-report=lcov --coverage test/*.js",
     "test:audit": "npm audit --json | npm-audit-html --output reports/audit.html && npm audit"
@@ -41,7 +41,10 @@
     "yargs": "^12.0.5"
   },
   "devDependencies": {
-    "babel": "^5.6.14",
+    "@babel/cli": "^7.2.0",
+    "@babel/core": "^7.2.2",
+    "@babel/node": "^7.2.2",
+    "@babel/preset-env": "^7.2.0",
     "eslint": "^5.10.0",
     "eslint-config-standard": "^12.0.0",
     "eslint-plugin-import": "^2.14.0",

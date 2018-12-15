@@ -4,7 +4,7 @@ const fs = require('fs')
 const assert = require('assert')
 const yargs = require('yargs')
 
-const Apkup = require('./lib')
+const { Apkup } = require('./lib')
 
 const argv = yargs
   .usage('Usage: $0 [options]')
@@ -56,8 +56,8 @@ if (argv.recentChanges) {
   })
 }
 
-const publisher = Apkup(authJSON)
-publisher.upload(argv.file, options).catch(err => {
+const apkup = Apkup(authJSON)
+apkup.upload(argv.file, options).catch(err => {
   console.error(err.stack)
   process.exit(1)
 })

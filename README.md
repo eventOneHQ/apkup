@@ -37,24 +37,24 @@ apkup \
 or the JavaScript API
 
 ```javascript
-const publisher = require('apkup')({
-  client_email: '',
-  private_key: ''
-})
+const publisher = require("apkup")({
+  client_email: "",
+  private_key: ""
+});
 
 publisher
-  .upload('/path/to/apk', {
+  .upload("/path/to/apk", {
     obbs: [
       // optional expansion files (max 2)
-      '/path/to/somefile.obb'
+      "/path/to/somefile.obb"
     ],
     recentChanges: {
-      'en-US': 'lorem ipsum dolor'
+      "en-US": "lorem ipsum dolor"
     }
   })
   .then(data => {
-    console.log(' > %s version %d is up!', data.packageName, data.versionCode)
-  })
+    console.log(" > %s version %d is up!", data.packageName, data.versionCode);
+  });
 ```
 
 ## Authentication
@@ -74,8 +74,8 @@ The `upload` method returns a `Promise` so this package can be used in conjuncti
 
 ```javascript
 gulp.task(upload, () => {
-  return publisher.upload(apk, params)
-})
+  return publisher.upload(apk, params);
+});
 ```
 
 ## CLI
@@ -112,74 +112,4 @@ The path to 1 or more expansion files
 
 ## API
 
-### Apkup = require('apkup')
-
-Apkup is a constructor that can be called with or without `new`
-
-### publisher = new Apkup(auth)
-
-The instance of Apkup has the `auth` option
-
-#### auth
-
-_Required_
-Type: `object`
-
-The object with Authentication information. This object will have the following keys
-
-- `client_email`
-- `private_key`
-
-### publisher.upload(apk[, params[, callback]])
-
-Upload specified APK. If no callback is specified, returns a `Promise`
-
-#### apk
-
-_Required_
-Type: `string`
-
-The path to the APK to upload
-
-#### params
-
-_Optional_
-Type: `object`
-
-The params object will add aditional information to this release. Currently, it can have these keys
-
-##### track
-
-Type: string
-Default: `'alpha'`
-
-Specify track for this release. Can be alpha, beta, production or rollout.
-
-##### recentChanges
-
-Type: object
-Default: `{}`
-
-An `object` that specifies changes in this version. Has the language code as key and the changes as value.
-
-##### obbs
-
-Type: Array
-Default: `[]`
-
-An array that specifies the paths to the expansion files (OBBs) for this release
-
-#### callback
-
-A function to be called when the process finishes. It receives two params:
-
-##### err
-
-The error if the upload was not succesful
-
-##### data
-
-An object with the following properties
-
-- `packageName`
-- `versionCode`
+See the [API docs](https://oss.filiosoft.com/apkup).

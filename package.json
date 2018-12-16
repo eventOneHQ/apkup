@@ -51,6 +51,7 @@
     "eslint-plugin-node": "^8.0.0",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
+    "jsdoc": "^3.5.5",
     "npm-audit-html": "^1.2.0",
     "proxyquire": "^1.6.0",
     "sinon": "^1.15.4",

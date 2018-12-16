@@ -1,7 +1,6 @@
 import { google } from 'googleapis'
 import assert from 'assert'
 import Upload from './upload'
-import nodeify from 'nodeify'
 
 /**
  * Apkup is a constructor that can be called with or without `new`.
@@ -24,24 +23,18 @@ function Apkup (auth) {
 
 /**
  * Upload an APK to the Google Play Developer Console.
+ * @async
  * @param {string} apk - The path to the APK.
  * @param {object} [params] - The params object will add additional information to this release.
  * @param {string} [params.track=alpha] - Specify track for this release. Can be `alpha`, `beta`, `production` or `rollout`.
  * @param {object} [params.recentChanges] - An `object` that specifies changes in this version. Has the language code as key and the changes as value.
  * @param {array} [params.obbs] - An array that specifies the paths to the expansion files (OBBs) for this release.
- * @param {Apkup~uploadCallback} cb - The callback that handles the upload response.
+ *
+ * @returns {Promise<object>} An object with the response data.
  */
-Apkup.prototype.upload = function upload (apk, params, cb) {
-  let up = new Upload(this.client, apk, params)
-  return nodeify(up.publish(), cb)
+Apkup.prototype.upload = async function upload (apk, params) {
+  const up = new Upload(this.client, apk, params)
+  return up.publish()
 }
-/**
- * A function to be called when the upload finishes.
- * @callback Apkup~uploadCallback
- * @param {object} err - The error if the upload was not successful.
- * @param {object} data - An object with the response data.
- * @param {string} data.packageName - Package name of the uploaded APK.
- * @param {string} data.versionCode - Version code of the uploaded APK.
- */
 
 export { Apkup }

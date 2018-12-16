@@ -35,10 +35,10 @@
   },
   "homepage": "https://github.com/Filiosoft/apkup",
   "dependencies": {
+    "@babel/polyfill": "^7.0.0",
+    "adbkit-apkreader": "^3.1.1",
     "debug": "^2.1.3",
     "googleapis": "^36.0.0",
-    "node-apk-parser": "^0.2.3",
-    "nodeify": "^1.0.0",
     "yargs": "^12.0.5"
   },
   "devDependencies": {

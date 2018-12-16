@@ -3,18 +3,18 @@ const proxyquire = require('proxyquire')
 const sinon = require('sinon')
 
 test('asks for options', function (t) {
-  const Publisher = require('../lib')
+  const { Apkup } = require('../lib')
   t.throws(function () {
-    Publisher()
+    Apkup()
   })
   t.throws(function () {
-    Publisher({ client_email: 'foo' })
+    Apkup({ client_email: 'foo' })
   })
   t.throws(function () {
-    Publisher({ private_key: 'foo' })
+    Apkup({ private_key: 'foo' })
   })
   t.doesNotThrow(function () {
-    Publisher({ client_email: 'foo', private_key: 'bar' })
+    Apkup({ client_email: 'foo', private_key: 'bar' })
   })
   t.end()
 })
@@ -26,13 +26,13 @@ test('Calls Upload with the right params', function (t) {
       return Promise.resolve()
     }
   })
-  const Publisher = proxyquire('../lib', {
+  const { Apkup } = proxyquire('../lib', {
     './upload': upload
   })
 
   const client = { client_email: 'foo', private_key: 'bar' }
   const params = {}
-  const p = Publisher(client)
+  const p = Apkup(client)
 
   p.upload('my.apk', params, onUpload)
 

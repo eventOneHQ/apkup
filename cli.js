@@ -57,7 +57,12 @@ if (argv.recentChanges) {
 }
 
 const apkup = Apkup(authJSON)
-apkup.upload(argv.file, options).catch(err => {
-  console.error(err.stack)
-  process.exit(1)
-})
+apkup
+  .upload(argv.file, options)
+  .then(resp => {
+    console.log('Upload successful!')
+  })
+  .catch(err => {
+    console.error(err.stack)
+    process.exit(1)
+  })

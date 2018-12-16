@@ -1,6 +1,7 @@
+import '@babel/polyfill'
 import { createReadStream } from 'fs'
 import Debug from 'debug'
-import apkParser from 'node-apk-parser'
+import ApkReader from 'adbkit-apkreader'
 import { google } from 'googleapis'
 import assert from 'assert'
 
@@ -29,206 +30,159 @@ export default class Upload {
     this.recentChanges = params.recentChanges
   }
 
-  publish () {
-    return this.parseManifest()
-      .then(() => this.authenticate())
-      .then(() => this.createEdit())
-      .then(() => this.uploadAPK())
-      .then(() => this.uploadOBBs())
-      .then(() => this.getRecentChanges())
-      .then(() => this.assignTrack())
-      .then(() => this.commitChanges())
-      .then(() => {
-        return {
-          packageName: this.packageName,
-          versionCode: this.versionCode
-        }
-      })
+  async publish () {
+    await this.parseManifest()
+    await this.authenticate()
+    await this.createEdit()
+    await this.uploadAPK()
+    await this.uploadOBBs()
+    await this.getRecentChanges()
+    await this.assignTrack()
+    await this.commitChanges()
+
+    return {
+      packageName: this.packageName,
+      versionCode: this.versionCode
+    }
   }
 
-  parseManifest () {
+  async parseManifest () {
     debug('> Parsing manifest')
-    // Wrapping in promise because apkParser throws in case of error
-    return Promise.resolve().then(() => {
-      const reader = apkParser.readFile(this.apk[0])
-      const manifest = reader.readManifestSync()
-      this.packageName = manifest.package
-      this.versionCode = manifest.versionCode
-      debug('> Detected package name %s', this.packageName)
-      debug('> Detected version code %d', this.versionCode)
-    })
+    const reader = await ApkReader.open(this.apk[0])
+    const manifest = await reader.readManifest()
+
+    this.packageName = manifest.package
+    this.versionCode = manifest.versionCode
+    debug(`> Detected package name ${this.packageName}`)
+    debug(`> Detected version code ${this.versionCode}`)
   }
 
-  authenticate () {
+  async authenticate () {
     debug('> Authenticating')
-    return new Promise((resolve, reject) => {
-      this.client.authorize(err => {
-        if (err) return reject(err)
-        debug('> Authenticated succesfully')
-        resolve()
-      })
-    })
+    await this.client.authorize()
+    debug('> Authenticated successfully')
   }
 
-  createEdit () {
+  async createEdit () {
     debug('> Creating edit')
-    return new Promise((resolve, reject) => {
-      publisher.edits.insert(
-        {
-          packageName: this.packageName,
-          auth: this.client
-        },
-        (err, edit) => {
-          if (err) return reject(err)
-          if (!edit) return reject(new Error('Unable to create edit'))
-          debug('> Created edit with id %d', edit.data.id)
-          this.editId = edit.data.id
-          resolve()
-        }
-      )
+    const edit = await publisher.edits.insert({
+      packageName: this.packageName,
+      auth: this.client
     })
+
+    if (!edit) {
+      throw new Error('Unable to create edit')
+    }
+    debug(`> Created edit with id ${edit.data.id}`)
+    this.editId = edit.data.id
   }
 
-  uploadAPK () {
+  async uploadAPK () {
     debug('> Uploading release')
     const that = this
-    const uploads = this.apk.map(apk => {
-      return new Promise((resolve, reject) => {
-        publisher.edits.apks.upload(
-          {
-            packageName: that.packageName,
-            editId: that.editId,
-            auth: that.client,
-            media: {
-              mimeType: 'application/vnd.android.package-archive',
-              body: createReadStream(apk)
-            }
-          },
-          (err, upload) => {
-            if (err) return reject(err)
-            debug(
-              '> Uploaded %s with version code %d and SHA1 %s',
-              apk,
-              upload.data.versionCode,
-              upload.data.binary.sha1
-            )
-            versionCodes.push(upload.data.versionCode)
-            resolve()
-          }
-        )
+    const uploads = this.apk.map(async apk => {
+      const upload = await publisher.edits.apks.upload({
+        packageName: that.packageName,
+        editId: that.editId,
+        auth: that.client,
+        media: {
+          mimeType: 'application/vnd.android.package-archive',
+          body: createReadStream(apk)
+        }
       })
+
+      debug(
+        `> Uploaded ${apk} with version code ${
+          upload.data.versionCode
+        } and SHA1 ${upload.data.binary.sha1}`
+      )
+      versionCodes.push(upload.data.versionCode)
     })
     return Promise.all(uploads)
   }
 
-  uploadOBBs () {
+  async uploadOBBs () {
     if (!this.obbs || !Array.isArray(this.obbs) || !this.obbs.length) {
-      return Promise.resolve()
+      return
     }
 
-    debug('> Uploading %d expansion file(s)', this.obbs.length)
-    let current = Promise.resolve()
+    debug(`> Uploading ${this.obbs.length} expansion file(s)`)
 
-    return Promise.all(
-      this.obbs.map(obb => {
-        current = current.then(this.uploadOBB(obb))
-        return current
+    await Promise.all(
+      this.obbs.map(async obb => {
+        await this.uploadOBB(obb)
       })
     )
   }
 
-  uploadOBB (obb) {
-    debug('Uploading expansion file %s', obb)
-    return new Promise((resolve, reject) => {
-      publisher.edits.expansionfiles.upload(
-        {
-          packageName: this.packageName,
-          editId: this.editId,
-          apkVersionCode: this.versionCode,
-          expansionFileType: 'main',
-          auth: this.client,
-          media: {
-            mimeType: 'application/octet-stream',
-            body: createReadStream(obb)
-          }
-        },
-        err => {
-          if (err) return reject(err)
-          resolve()
-        }
-      )
+  async uploadOBB (obb) {
+    debug(`> Uploading expansion file ${obb}`)
+    await publisher.edits.expansionfiles.upload({
+      packageName: this.packageName,
+      editId: this.editId,
+      apkVersionCode: this.versionCode,
+      expansionFileType: 'main',
+      auth: this.client,
+      media: {
+        mimeType: 'application/octet-stream',
+        body: createReadStream(obb)
+      }
     })
   }
 
-  assignTrack () {
-    return new Promise((resolve, reject) => {
-      debug('> Assigning APK to %s track', this.track)
-      publisher.edits.tracks.update(
-        {
-          packageName: this.packageName,
-          editId: this.editId,
-          track: this.track,
-          resource: {
-            track: this.track,
-            releases: [
-              {
-                versionCodes,
-                releaseNotes,
-                status: 'completed'
-              }
-            ]
-          },
-          auth: this.client
-        },
-        (err, track) => {
-          if (err) return reject(err)
-          debug('> Assigned APK to %s track', this.track)
-          resolve()
-        }
-      )
-    })
-  }
-
-  getRecentChanges () {
+  async getRecentChanges () {
     if (!this.recentChanges || !Object.keys(this.recentChanges).length) {
-      return Promise.resolve()
+      return
     }
     debug('> Adding what changed')
 
-    let current = Promise.resolve()
-    return Promise.all(
-      Object.keys(this.recentChanges).map(lang => {
-        current = current.then(this.sendRecentChange(lang))
-        return current
+    await Promise.all(
+      Object.keys(this.recentChanges).map(async lang => {
+        await this.sendRecentChange(lang)
       })
     )
   }
 
-  sendRecentChange (lang) {
-    return new Promise((resolve, reject) => {
-      const changes = this.recentChanges[lang]
-      releaseNotes.push({ language: lang, text: changes })
-      debug('> Added recent changes for %s', lang)
-      resolve()
+  async sendRecentChange (lang) {
+    const changes = this.recentChanges[lang]
+    releaseNotes.push({
+      language: lang,
+      text: changes
     })
+    debug(`> Added recent changes for ${lang}`)
   }
 
-  commitChanges () {
-    debug('> Commiting changes')
-    return new Promise((resolve, reject) => {
-      publisher.edits.commit(
-        {
-          editId: this.editId,
-          packageName: this.packageName,
-          auth: this.client
-        },
-        (err, commit) => {
-          if (err) return reject(err)
-          debug('> Commited changes')
-          resolve()
-        }
-      )
+  async assignTrack () {
+    debug(`> Assigning APK to ${this.track} track`)
+    await publisher.edits.tracks.update({
+      packageName: this.packageName,
+      editId: this.editId,
+      track: this.track,
+      resource: {
+        track: this.track,
+        releases: [
+          {
+            versionCodes,
+            releaseNotes,
+            status: 'completed'
+          }
+        ]
+      },
+      auth: this.client
     })
+
+    debug(`> Assigned APK to ${this.track} track`)
+  }
+
+  async commitChanges () {
+    debug('> Commiting changes')
+    await publisher.edits.commit({
+      editId: this.editId,
+      packageName: this.packageName,
+      auth: this.client
+    })
+
+    debug('> Commited changes')
   }
 }
 

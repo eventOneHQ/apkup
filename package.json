@@ -16,10 +16,7 @@
     "test-lcov": "eslint . &&  tap --coverage-report=lcov --coverage test/*.js",
     "test:audit": "npm audit --json | npm-audit-html --output reports/audit.html && npm audit"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Filiosoft/apkup"
-  },
+  "repository": "Filiosoft/apkup",
   "keywords": [
     "android",
     "google",
@@ -28,7 +25,7 @@
     "mobile",
     "apk"
   ],
-  "author": "Jeduan Cornejo <jeduan@gmail.com>",
+  "author": "Filiosoft Labs <opensource@filiosoft.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Filiosoft/apkup/issues"

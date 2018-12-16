@@ -1,12 +1,15 @@
 import { createReadStream } from 'fs'
 import Debug from 'debug'
 import apkParser from 'node-apk-parser'
-import { androidpublisher } from 'googleapis'
+import { google } from 'googleapis'
 import assert from 'assert'
 
 const debug = Debug('apkup')
-const publisher = androidpublisher('v2')
+const publisher = google.androidpublisher({
+  version: 'v3'
+})
 const versionCodes = []
+const releaseNotes = []
 
 export default class Upload {
   constructor (
@@ -32,8 +35,8 @@ export default class Upload {
       .then(() => this.createEdit())
       .then(() => this.uploadAPK())
       .then(() => this.uploadOBBs())
+      .then(() => this.getRecentChanges())
       .then(() => this.assignTrack())
-      .then(() => this.sendRecentChanges())
       .then(() => this.commitChanges())
       .then(() => {
         return {
@@ -78,8 +81,8 @@ export default class Upload {
         (err, edit) => {
           if (err) return reject(err)
           if (!edit) return reject(new Error('Unable to create edit'))
-          debug('> Created edit with id %d', edit.id)
-          this.editId = edit.id
+          debug('> Created edit with id %d', edit.data.id)
+          this.editId = edit.data.id
           resolve()
         }
       )
@@ -106,10 +109,10 @@ export default class Upload {
             debug(
               '> Uploaded %s with version code %d and SHA1 %s',
               apk,
-              upload.versionCode,
-              upload.binary.sha1
+              upload.data.versionCode,
+              upload.data.binary.sha1
             )
-            versionCodes.push(upload.versionCode)
+            versionCodes.push(upload.data.versionCode)
             resolve()
           }
         )
@@ -166,20 +169,27 @@ export default class Upload {
           editId: this.editId,
           track: this.track,
           resource: {
-            versionCodes: versionCodes
+            track: this.track,
+            releases: [
+              {
+                versionCodes,
+                releaseNotes,
+                status: 'completed'
+              }
+            ]
           },
           auth: this.client
         },
         (err, track) => {
           if (err) return reject(err)
-          debug('> Assigned APK to %s track', track.track)
+          debug('> Assigned APK to %s track', this.track)
           resolve()
         }
       )
     })
   }
 
-  sendRecentChanges () {
+  getRecentChanges () {
     if (!this.recentChanges || !Object.keys(this.recentChanges).length) {
       return Promise.resolve()
     }
@@ -197,23 +207,9 @@ export default class Upload {
   sendRecentChange (lang) {
     return new Promise((resolve, reject) => {
       const changes = this.recentChanges[lang]
-      publisher.edits.apklistings.update(
-        {
-          apkVersionCode: this.versionCode,
-          editId: this.editId,
-          language: lang,
-          packageName: this.packageName,
-          resource: {
-            recentChanges: changes
-          },
-          auth: this.client
-        },
-        (err, edit) => {
-          if (err) return reject(err)
-          debug('> Added recent changes for %s', lang)
-          resolve()
-        }
-      )
+      releaseNotes.push({ language: lang, text: changes })
+      debug('> Added recent changes for %s', lang)
+      resolve()
     })
   }
 

@@ -1,15 +1,13 @@
-# apkup [![Build Status][travis-image]][travis-url] [![Coverage Status][coveralls-image]][coveralls-url] [![npm][npm-image]][npm-url] [![js-standard-style][standard-image]][standard-url]
+<h1 align="center">apkup</h1>
 
-[travis-image]: https://travis-ci.org/Filiosoft/apkup.svg?branch=master
-[travis-url]: https://travis-ci.org/Filiosoft/apkup
-[coveralls-image]: https://coveralls.io/repos/filiosoft/apkup/badge.svg?branch=master&service=github
-[coveralls-url]: https://coveralls.io/github/filiosoft/apkup?branch=master
-[npm-image]: https://img.shields.io/npm/v/apkup.svg?style=flat
-[npm-url]: https://npmjs.org/package/apkup
-[standard-image]: https://img.shields.io/badge/code_style-standard-brightgreen.svg
-[standard-url]: https://standardjs.com
+<p align="center">
+<a href="https://www.npmjs.com/package/apkup"><img src="https://img.shields.io/npm/v/apkup.svg?style=flat" alt="npm"></a>
+<a href="https://travis-ci.org/Filiosoft/apkup"><img src="https://travis-ci.org/Filiosoft/apkup.svg?branch=master" alt="Build Status"></a>
+<a href="https://coveralls.io/github/filiosoft/apkup?branch=master"><img src="https://coveralls.io/repos/filiosoft/apkup/badge.svg?branch=master&service=github" alt="GitHub license"></a>
+<a href="https://standardjs.com"><img src="https://img.shields.io/badge/code_style-standard-brightgreen.svg" alt="JavaScript Style Guide"></a>
 
-> Upload APKs to Google Play
+</p>
+<p align="center"><b>🚀 Upload APKs to Google Play</b></p>
 
 This package offers a streamlined way to publish packages in the Google Play Store.
 
@@ -37,12 +35,14 @@ apkup \
 or the JavaScript API
 
 ```javascript
-const publisher = require("apkup")({
+const { Apkup } = require("apkup");
+
+const apkup = Apkup({
   client_email: "",
   private_key: ""
 });
 
-publisher
+apkup
   .upload("/path/to/apk", {
     obbs: [
       // optional expansion files (max 2)
@@ -53,7 +53,7 @@ publisher
     }
   })
   .then(data => {
-    console.log(" > %s version %d is up!", data.packageName, data.versionCode);
+    console.log(` > ${data.packageName} version ${data.versionCode} is up!`);
   });
 ```
 
@@ -68,7 +68,7 @@ After that follow the instructions to create a Service Account.
 When you click Create Client ID, choose Service Account. You will get a JSON file
 with a public key and the service email.
 
-## gulp support
+## Gulp Support
 
 The `upload` method returns a `Promise` so this package can be used in conjunction with gulp with no extra plugins needed
 

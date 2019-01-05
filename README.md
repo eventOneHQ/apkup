@@ -2,8 +2,8 @@
 
 <p align="center">
 <a href="https://www.npmjs.com/package/apkup"><img src="https://img.shields.io/npm/v/apkup.svg?style=flat" alt="npm"></a>
-<a href="https://travis-ci.org/Filiosoft/apkup"><img src="https://travis-ci.org/Filiosoft/apkup.svg?branch=master" alt="Build Status"></a>
-<a href="https://coveralls.io/github/filiosoft/apkup?branch=master"><img src="https://coveralls.io/repos/filiosoft/apkup/badge.svg?branch=master&service=github" alt="GitHub license"></a>
+<a href="https://travis-ci.org/eventOneHQ/apkup"><img src="https://travis-ci.org/eventOneHQ/apkup.svg?branch=master" alt="Build Status"></a>
+<a href="https://coveralls.io/github/eventOneHQ/apkup?branch=master"><img src="https://coveralls.io/repos/eventOneHQ/apkup/badge.svg?branch=master&service=github" alt="GitHub license"></a>
 <a href="https://standardjs.com"><img src="https://img.shields.io/badge/code_style-standard-brightgreen.svg" alt="JavaScript Style Guide"></a>
 
 </p>

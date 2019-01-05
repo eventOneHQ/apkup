@@ -14,23 +14,17 @@
     "docs": "jsdoc src/ README.md",
     "test": "eslint . && tap test/*.js",
     "test-lcov": "eslint . &&  tap --coverage-report=lcov --coverage test/*.js",
-    "test:audit": "npm audit --json | npm-audit-html --output reports/audit.html && npm audit"
+    "test:audit":
+      "npm audit --json | npm-audit-html --output reports/audit.html && npm audit"
   },
-  "repository": "Filiosoft/apkup",
-  "keywords": [
-    "android",
-    "google",
-    "play",
-    "google play",
-    "mobile",
-    "apk"
-  ],
-  "author": "Filiosoft Labs <opensource@filiosoft.com>",
+  "repository": "eventOneHQ/apkup",
+  "keywords": ["android", "google", "play", "google play", "mobile", "apk"],
+  "author": "eventOne Labs <opensource@event1.io>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Filiosoft/apkup/issues"
+    "url": "https://github.com/eventOneHQ/apkup/issues"
   },
-  "homepage": "https://github.com/Filiosoft/apkup",
+  "homepage": "https://github.com/eventOneHQ/apkup",
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
     "adbkit-apkreader": "^3.1.1",

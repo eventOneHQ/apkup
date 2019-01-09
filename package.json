@@ -8,17 +8,25 @@
   },
   "scripts": {
     "prepublishOnly": "npm run build && npm prune",
+    "version": "npm run build",
+    "postversion": "git push && git push --tags",
     "build": "babel src --out-dir lib",
     "build-debug": "babel src --out-dir lib --source-maps inline",
     "watch": "babel src --watch --out-dir lib --source-maps true",
     "docs": "jsdoc src/ README.md",
     "test": "eslint . && tap test/*.js",
     "test-lcov": "eslint . &&  tap --coverage-report=lcov --coverage test/*.js",
-    "test:audit":
-      "npm audit --json | npm-audit-html --output reports/audit.html && npm audit"
+    "test:audit": "npm audit --json | npm-audit-html --output reports/audit.html && npm audit"
   },
   "repository": "eventOneHQ/apkup",
-  "keywords": ["android", "google", "play", "google play", "mobile", "apk"],
+  "keywords": [
+    "android",
+    "google",
+    "play",
+    "google play",
+    "mobile",
+    "apk"
+  ],
   "author": "eventOne Labs <opensource@event1.io>",
   "license": "MIT",
   "bugs": {

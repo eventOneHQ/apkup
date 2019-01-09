@@ -116,4 +116,4 @@ The path to 1 or more expansion files
 
 ## API
 
-See the [API docs](https://oss.filiosoft.com/apkup).
+See the [API docs](https://oss.eventone.page/apkup).

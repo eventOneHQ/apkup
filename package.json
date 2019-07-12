@@ -9,8 +9,6 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "prepublishOnly": "npm run build && npm prune",
-    "version": "npm run build",
-    "postversion": "git push && git push --tags",
     "build": "tsc",
     "docs": "typedoc --mode file --excludeExternals --excludeNotExported --exclude 'src/cli.ts' --out docs src",
     "test": "tslint -c tslint.json 'src/**/*.ts'",

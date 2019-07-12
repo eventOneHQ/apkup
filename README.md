@@ -2,8 +2,7 @@
 
 <p align="center">
 <a href="https://www.npmjs.com/package/apkup"><img src="https://img.shields.io/npm/v/apkup.svg?style=flat" alt="npm"></a>
-<a href="https://travis-ci.org/eventOneHQ/apkup"><img src="https://travis-ci.org/eventOneHQ/apkup.svg?branch=master" alt="Build Status"></a>
-<a href="https://coveralls.io/github/eventOneHQ/apkup?branch=master"><img src="https://coveralls.io/repos/eventOneHQ/apkup/badge.svg?branch=master&service=github" alt="GitHub license"></a>
+<a href="https://travis-ci.com/eventOneHQ/apkup"><img src="https://travis-ci.com/eventOneHQ/apkup.svg?branch=master" alt="Build Status"></a>
 <a href="https://standardjs.com"><img src="https://img.shields.io/badge/code_style-standard-brightgreen.svg" alt="JavaScript Style Guide"></a>
 
 </p>
@@ -26,7 +25,7 @@ Use the CLI
 ```bash
 apkup \
   --auth api.json \
-  --recent-changes "en-US='lorem ipsum dolor'" \
+  --release-notes "en-US='lorem ipsum dolor'" \
   --file /path/to/Package.apk \
   --obbs /path/to/Expansion.obb \  # optional
   --obbs /path/to/Expansion2.obb   # optional
@@ -35,22 +34,25 @@ apkup \
 or the JavaScript API
 
 ```javascript
-const { Apkup } = require("apkup");
+const { Apkup } = require('apkup');
 
 const apkup = Apkup({
-  client_email: "",
-  private_key: ""
+  client_email: '',
+  private_key: ''
 });
 
 apkup
-  .upload("/path/to/apk", {
+  .upload('/path/to/apk', {
     obbs: [
       // optional expansion files (max 2)
-      "/path/to/somefile.obb"
+      '/path/to/somefile.obb'
     ],
-    recentChanges: {
-      "en-US": "lorem ipsum dolor"
-    }
+    releaseNotes: [
+      {
+        language: 'en-US',
+        text: 'Minor bug fixes...'
+      }
+    ]
   })
   .then(data => {
     console.log(` > ${data.packageName} version ${data.versionCode} is up!`);
@@ -84,7 +86,7 @@ gulp.task(upload, () => {
 
 ## CLI
 
-### apkup --auth auth.json --recent-changes "recent changes" --file app.apk --obbs [OBB]
+### apkup --auth auth.json --release-notes "release notes" --file app.apk --obbs [OBB]
 
 #### auth
 
@@ -93,7 +95,7 @@ Type: `File`
 
 a JSON file with the [Authentication information](#authentication)
 
-#### recent-changes
+#### release-notes
 
 _Required_
 Type: `string`

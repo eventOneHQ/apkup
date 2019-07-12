@@ -1,23 +1,35 @@
-sudo: false
 language: node_js
 node_js:
-  - "node"
+  - 'node'
 cache:
   directories:
     - ~/.npm
-script:
-  # - npm test
-  - npm run docs
+stages:
+  - test
+  - release
+jobs:
+  include:
+    - stage: test
+      node_js: lts/*
+      script:
+        - npm run test || true
+        - npm run docs
+      deploy:
+        provider: pages
+        skip-cleanup: true
+        github-token: $GH_TOKEN
+        local-dir: docs
+        on:
+          branch: master
+          repo: eventOneHQ/apkup
+    - stage: release
+      node_js: lts/*
+      deploy:
+        provider: script
+        skip_cleanup: true
+        script: echo "Nothing to do" # npx semantic-release
+        on:
+          branch: master
+          repo: eventOneHQ/apkup
 notifications:
   email: false
-branches:
-  except:
-    - /^v\d+\.\d+\.\d+$/
-deploy:
-  provider: pages
-  skip-cleanup: true
-  github-token: $GITHUB_TOKEN
-  keep-history: true
-  local-dir: out
-  on:
-    branch: master

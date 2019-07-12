@@ -45,6 +45,7 @@ npx apkup -h
 npm i -D apkup
 ```
 
+### CLI
 Then use the CLI:
 
 ```bash
@@ -56,6 +57,9 @@ apkup \
   --obbs /path/to/Expansion2.obb   # optional
 ```
 
+You can also specify each parameter via environment variables prefixed with `APKUP_` (e.g. `APKUP_KEY` or `APKUP_APK`).
+
+### Library
 Or use the JavaScript library!
 
 ```javascript

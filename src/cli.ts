@@ -1,8 +1,4 @@
 #!/usr/bin/env node
-/**
- * @ignore
- */
-
 import assert from 'assert'
 import fs from 'fs'
 import yargs from 'yargs'
@@ -10,38 +6,41 @@ import yargs from 'yargs'
 import { Apkup } from './index'
 import { IUploadParams } from './upload'
 
+const key = process.env.GOOGLE_KEY
+
 const argv = yargs
   .usage('Usage: $0 [options]')
-  .option('k', {
-    alias: 'key',
+  .option('key', {
+    alias: 'k',
     demandOption: true,
-    describe: 'Path to a JSON file that contains private key and client email'
+    describe:
+      'Path to a JSON file that contains private key and client email (can be specified via APKUP_KEY env variable)'
   })
-  .option('a', {
-    alias: 'apk',
+  .option('apk', {
+    alias: 'a',
     demandOption: true,
     describe: 'Path to the APK file'
   })
-  .option('t', {
-    alias: 'track',
+  .option('track', {
+    alias: 't',
     default: 'internal',
-    describe:
-      'Can be `internal`, `alpha`, `beta`, `production` or `rollout`. Default: `internal`',
+    describe: `Can be 'internal', 'alpha', 'beta', 'production' or 'rollout'. Default: 'internal'`,
     type: 'string'
   })
-  .option('r', {
-    alias: 'release-notes',
-    describe: 'A string with the format `lang=changes`',
+  .option('release-notes', {
+    alias: 'r',
+    describe: `A string with the format 'lang=changes'`,
     type: 'array'
   })
-  .option('o', {
-    alias: 'obbs',
+  .option('obbs', {
+    alias: 'o',
     describe: 'Path to optional expansion files (max 2)',
     type: 'array'
   })
-  .help('h').argv
+  .env('APKUP')
+  .help('help').argv
 
-const json = fs.readFileSync(argv.auth).toString('utf8')
+const json = fs.readFileSync(argv.auth || key).toString('utf8')
 const authJSON = JSON.parse(json) // assume a JSON file
 
 const options: IUploadParams = {

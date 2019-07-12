@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 import assert from 'assert'
 import fs from 'fs'
+import ora from 'ora'
 import yargs from 'yargs'
 
 import { Apkup } from './index'
 import { IUploadParams } from './upload'
-
-const key = process.env.GOOGLE_KEY
 
 const argv = yargs
   .usage('Usage: $0 [options]')
@@ -40,7 +39,7 @@ const argv = yargs
   .env('APKUP')
   .help('help').argv
 
-const json = fs.readFileSync(argv.auth || key).toString('utf8')
+const json = fs.readFileSync(argv.key).toString('utf8')
 const authJSON = JSON.parse(json) // assume a JSON file
 
 const options: IUploadParams = {
@@ -71,13 +70,19 @@ if (argv.releaseNotes) {
 
 const apkup = new Apkup(authJSON)
 
+const spinner = ora('Uploading APK...').start()
+
 apkup
-  .upload(argv.file, options)
+  .upload(argv.apk, options)
   .then((resp) => {
+    spinner.stop()
+
     // tslint:disable-next-line: no-console
     console.log('Upload successful!')
   })
   .catch((err) => {
+    spinner.stop()
+
     // tslint:disable-next-line: no-console
     console.error(err.stack)
     process.exit(1)

@@ -7,33 +7,36 @@ import assert from 'assert'
 import fs from 'fs'
 import yargs from 'yargs'
 
-import Apkup from './index'
+import { Apkup } from './index'
 import { IUploadParams } from './upload'
 
 const argv = yargs
   .usage('Usage: $0 [options]')
-  .option('t', {
-    alias: 'track',
-    default: 'alpha',
-    type: 'string'
+  .option('k', {
+    alias: 'key',
+    demandOption: true,
+    describe: 'Path to a JSON file that contains private key and client email'
   })
   .option('a', {
-    alias: 'auth',
+    alias: 'apk',
     demandOption: true,
-    describe: 'JSON file that contains private key and client email'
+    describe: 'Path to the APK file'
+  })
+  .option('t', {
+    alias: 'track',
+    default: 'internal',
+    describe:
+      'Can be `internal`, `alpha`, `beta`, `production` or `rollout`. Default: `internal`',
+    type: 'string'
   })
   .option('r', {
     alias: 'release-notes',
+    describe: 'A string with the format `lang=changes`',
     type: 'array'
-  })
-  .option('f', {
-    alias: 'file',
-    demandOption: true,
-    describe: 'APK files'
   })
   .option('o', {
     alias: 'obbs',
-    describe: 'Optional expansion files (max 2)',
+    describe: 'Path to optional expansion files (max 2)',
     type: 'array'
   })
   .help('h').argv
@@ -51,7 +54,8 @@ if (argv.releaseNotes) {
   options.releaseNotes = []
 
   for (const change of argv.releaseNotes) {
-    assert.notStrictEqual(
+    console.log(change)
+    assert.strictEqual(
       change.includes('='),
       true,
       'Unable to parse release notes'
@@ -69,6 +73,7 @@ if (argv.releaseNotes) {
 
 const apkup = new Apkup(authJSON)
 
+console.log(options)
 apkup
   .upload(argv.file, options)
   .then((resp) => {

@@ -14,8 +14,13 @@ A fork of [playup](https://github.com/jeduan/playup).
 
 ## Install
 
-```
+```bash
 npm install -g apkup
+
+apkup --help
+
+# or locally
+npx apkup --help
 ```
 
 ## Usage
@@ -24,9 +29,9 @@ Use the CLI
 
 ```bash
 apkup \
-  --auth api.json \
+  --key api.json \
+  --apk /path/to/Package.apk \
   --release-notes "en-US='lorem ipsum dolor'" \
-  --file /path/to/Package.apk \
   --obbs /path/to/Expansion.obb \  # optional
   --obbs /path/to/Expansion2.obb   # optional
 ```
@@ -34,6 +39,9 @@ apkup \
 or the JavaScript API
 
 ```javascript
+// typescript / modulejs
+import { Apkup } = from 'apkup';
+// or commonjs
 const { Apkup } = require('apkup');
 
 const apkup = Apkup({
@@ -84,38 +92,44 @@ gulp.task(upload, () => {
 });
 ```
 
-## CLI
+## CLI Usage
 
-### apkup --auth auth.json --release-notes "release notes" --file app.apk --obbs [OBB]
+```bash
+apkup --key auth.json --release-notes "release notes" --apk app.apk --obbs [OBB]
+```
 
-#### auth
+#### key
 
-_Required_
-Type: `File`
-
-a JSON file with the [Authentication information](#authentication)
-
-#### release-notes
-
-_Required_
+[_Required_]
 Type: `string`
 
-A string with the format `lang=changes` where lang is the language code and changes the string that specifies the changes of this
+The path to a JSON file with the [Authentication information](#authentication)
+
+#### apk
+
+[_Required_]
+Type: `string`
+
+The path to the APK
 
 #### track
 
 Type: `string`
 
-Specify track for this release. Can be alpha, beta, production or rollout. Default: alpha
+Specify track for this release. Can be `internal`, `alpha`, `beta`, `production` or `rollout`. Default: `internal`
 
-#### APK
+#### release-notes
 
-The path to the APK
+Type: `string[]`
 
-#### OBB
+A string with the format `lang=changes` where `lang` is the language code and `changes` the string that specifies the release notes
 
-The path to 1 or more expansion files
+#### obbs
 
-## API
+Type: `string[]`
 
-See the [API docs](https://oss.eventone.page/apkup).
+The path to 1 or 2 expansion files
+
+## API Usage
+
+See the [API docs](https://oss.eventone.page/apkup/classes/apkup).

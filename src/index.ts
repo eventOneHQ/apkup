@@ -15,13 +15,13 @@ export interface IAuthParams {
  * Apkup constructor
  *
  * ```typescript
- * import Apkup from 'apkup'
+ * import { Apkup } from 'apkup'
  *
  * const auth = require('./auth.json')
  * const apkup = new Apkup(auth)
  * ```
  */
-export default class Apkup {
+export class Apkup {
   private client: JWT
 
   /**

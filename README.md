@@ -47,7 +47,7 @@ npm i -D apkup
 
 Then use the CLI:
 
-```
+```bash
 apkup \
   --key api.json \
   --apk /path/to/Package.apk \

@@ -10,23 +10,24 @@ const publisher = google.androidpublisher({
   version: 'v3'
 })
 
-export interface UploadParams {
-  /** Specify track for this release. Can be `internal`, `alpha`, `beta`, `production` or `rollout`. Defaults to `internal` */
+export interface IUploadParams {
+  // tslint:disable-next-line: max-line-length
+  /** Specify track for this release. Can be `internal`, `alpha`, `beta`, `production` or `rollout`. Default: `internal` */
   track?: string
-  /**An array of objects that specifies changes in this version. Each object has a `language` and `text`. */
-  releaseNotes?: ReleaseNotes[]
+  /** An array of objects that specifies changes in this version. Each object has a `language` and `text`. */
+  releaseNotes?: IReleaseNotes[]
   /** An array that specifies the paths to the expansion files (OBBs) for this release. */
   obbs?: string[]
 }
 
-export interface UploadResponse {
+export interface IUploadResponse {
   /** ID of the package that was uploaded. */
   packageName?: string
   /** Version code of the package that was uploaded. */
   versionCode?: number
 }
 
-export interface ReleaseNotes {
+export interface IReleaseNotes {
   /** Language of the release notes */
   language: string
   /** Text of the release notes */
@@ -53,9 +54,9 @@ export class Upload {
   private obbs: string[]
 
   private versionCodes: any[] = []
-  private releaseNotes: ReleaseNotes[] = []
+  private releaseNotes: IReleaseNotes[] = []
 
-  constructor (client: JWT, apk: string, params: UploadParams = {}) {
+  constructor (client: JWT, apk: string | string[], params: IUploadParams = {}) {
     assert(client, 'I require a client')
     assert(apk, 'I require an APK route')
     if (params.track) {
@@ -70,7 +71,7 @@ export class Upload {
     this.releaseNotes = params.releaseNotes || []
   }
 
-  public async publish (): Promise<UploadResponse> {
+  public async publish (): Promise<IUploadResponse> {
     await this.parseManifest()
     await this.authenticate()
     await this.createEdit()
@@ -105,8 +106,8 @@ export class Upload {
   private async createEdit () {
     debug('> Creating edit')
     const edit = await publisher.edits.insert({
-      packageName: this.packageName,
-      auth: this.client
+      auth: this.client,
+      packageName: this.packageName
     })
 
     if (!edit) {
@@ -120,13 +121,13 @@ export class Upload {
     debug('> Uploading release')
     const uploads = this.apk.map(async (apk) => {
       const uploadJob = await publisher.edits.apks.upload({
-        packageName: this.packageName,
-        editId: this.editId,
         auth: this.client,
+        editId: this.editId,
         media: {
-          mediaType: 'application/vnd.android.package-archive',
-          body: createReadStream(apk)
-        }
+          body: createReadStream(apk),
+          mediaType: 'application/vnd.android.package-archive'
+        },
+        packageName: this.packageName
       })
 
       debug(
@@ -156,15 +157,15 @@ export class Upload {
 
     return publisher.edits.expansionfiles.upload(
       {
-        packageName: this.packageName,
-        editId: this.editId,
         apkVersionCode: this.versionCode,
-        expansionFileType: 'main',
         auth: this.client,
+        editId: this.editId,
+        expansionFileType: 'main',
         media: {
-          mediaType: 'application/octet-stream',
-          body: createReadStream(obb)
-        }
+          body: createReadStream(obb),
+          mediaType: 'application/octet-stream'
+        },
+        packageName: this.packageName
       },
       {}
     )
@@ -174,20 +175,20 @@ export class Upload {
     debug(`> Assigning APK to ${this.track} track`)
     const trackUpdate = await publisher.edits.tracks.update(
       {
-        packageName: this.packageName,
-        editId: this.editId,
-        track: this.track,
         auth: this.client,
+        editId: this.editId,
+        packageName: this.packageName,
         requestBody: {
-          track: this.track,
           releases: [
             {
-              versionCodes: this.versionCodes,
               releaseNotes: this.releaseNotes,
-              status: 'completed'
+              status: 'completed',
+              versionCodes: this.versionCodes
             }
-          ]
-        }
+          ],
+          track: this.track
+        },
+        track: this.track
       },
       {}
     )
@@ -200,9 +201,9 @@ export class Upload {
   private async commitChanges () {
     debug('> Commiting changes')
     const editCommit = await publisher.edits.commit({
+      auth: this.client,
       editId: this.editId,
-      packageName: this.packageName,
-      auth: this.client
+      packageName: this.packageName
     })
 
     debug('> Commited changes')

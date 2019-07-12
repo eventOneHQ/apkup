@@ -1,10 +1,10 @@
 import assert from 'assert'
 import { JWT } from 'google-auth-library'
 import { google } from 'googleapis'
-import { Upload, UploadParams, UploadResponse } from './upload'
+import { IUploadParams, IUploadResponse, Upload } from './upload'
 
 /* Object with Authentication information. */
-export interface AuthParams {
+export interface IAuthParams {
   /** Google Client Email */
   client_email: string
   /** Google Private Key */
@@ -29,7 +29,7 @@ export default class Apkup {
    * @param {object} auth.client_email Google Client Email
    * @param {object} auth.private_key Google Private Key
    */
-  constructor (auth: AuthParams) {
+  constructor (auth: IAuthParams) {
     assert(auth.client_email, 'Missing required parameter client_email')
     assert(auth.private_key, 'Missing required parameter private_key')
 
@@ -47,7 +47,7 @@ export default class Apkup {
    * @param {object} params The params object will add additional information to this release.
    *
    * @returns An object with the response data.
-   * 
+   *
    * ```typescript
    * const upload = await apkup.upload('./android-debug.apk', {
    *   track: 'beta',
@@ -62,8 +62,8 @@ export default class Apkup {
    */
   public async upload (
     apk: string,
-    params?: UploadParams
-  ): Promise<UploadResponse> {
+    params?: IUploadParams
+  ): Promise<IUploadResponse> {
     const up = new Upload(this.client, apk, params)
     return up.publish()
   }

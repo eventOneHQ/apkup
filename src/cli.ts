@@ -8,7 +8,7 @@ import fs from 'fs'
 import yargs from 'yargs'
 
 import Apkup from './index'
-import { UploadParams } from './upload'
+import { IUploadParams } from './upload'
 
 const argv = yargs
   .usage('Usage: $0 [options]')
@@ -41,7 +41,7 @@ const argv = yargs
 const json = fs.readFileSync(argv.auth).toString('utf8')
 const authJSON = JSON.parse(json) // assume a JSON file
 
-const options: UploadParams = {
+const options: IUploadParams = {
   obbs: argv.obbs,
   releaseNotes: [],
   track: argv.track
@@ -72,9 +72,11 @@ const apkup = new Apkup(authJSON)
 apkup
   .upload(argv.file, options)
   .then((resp) => {
+    // tslint:disable-next-line: no-console
     console.log('Upload successful!')
   })
   .catch((err) => {
+    // tslint:disable-next-line: no-console
     console.error(err.stack)
     process.exit(1)
   })

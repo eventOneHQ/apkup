@@ -54,7 +54,6 @@ if (argv.releaseNotes) {
   options.releaseNotes = []
 
   for (const change of argv.releaseNotes) {
-    console.log(change)
     assert.strictEqual(
       change.includes('='),
       true,
@@ -73,7 +72,6 @@ if (argv.releaseNotes) {
 
 const apkup = new Apkup(authJSON)
 
-console.log(options)
 apkup
   .upload(argv.file, options)
   .then((resp) => {

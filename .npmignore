@@ -1,1 +1,5 @@
 .gitignore
+.git
+docs
+node_modules
+.travis.yml

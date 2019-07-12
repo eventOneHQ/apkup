@@ -1,33 +1,53 @@
-<h1 align="center">apkup</h1>
+<h3 align="center">Apkup</h3>
 
-<p align="center">
-<a href="https://www.npmjs.com/package/apkup"><img src="https://img.shields.io/npm/v/apkup.svg?style=flat" alt="npm"></a>
-<a href="https://travis-ci.com/eventOneHQ/apkup"><img src="https://travis-ci.com/eventOneHQ/apkup.svg?branch=master" alt="Build Status"></a>
-<a href="https://standardjs.com"><img src="https://img.shields.io/badge/code_style-standard-brightgreen.svg" alt="JavaScript Style Guide"></a>
+<div align="center">
 
+![npm](https://img.shields.io/npm/v/apkup.svg)
+[![GitHub Issues](https://img.shields.io/github/issues/eventOneHQ/apkup.svg)](https://github.com/eventOneHQ/apkup/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/eventOneHQ/apkup.svg)](https://github.com/eventOneHQ/apkup/pulls)
+[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
+
+</div>
+
+---
+
+<p align="center"> Publish APKs to Google Play directly from the terminal
+    <br> 
 </p>
-<p align="center"><b>🚀 Upload APKs to Google Play</b></p>
 
 This package offers a streamlined way to publish packages in the Google Play Store.
 
 A fork of [playup](https://github.com/jeduan/playup).
 
-## Install
+## 📝 Table of Contents
+
+- [Getting Started](#getting_started)
+- [Usage](#usage)
+- [Authentication](#authentication)
+- [Contributing](CONTRIBUTING.md)
+- [Authors](#authors)
+- [Acknowledgments](#acknowledgement)
+
+## 🏁 Getting Started <a name = "getting_started"></a>
+
+Getting started with `apkup` is pretty easy and straight forward.
+
+Install the `apkup` package globally or locally:
 
 ```bash
-npm install -g apkup
+npm i -g apkup
+apkup -h
 
-apkup --help
+# or if you just want to use the CLI locally
+npx apkup -h
 
-# or locally
-npx apkup --help
+# or install the library into your project
+npm i -D apkup
 ```
 
-## Usage
+Then use the CLI:
 
-Use the CLI
-
-```bash
+```
 apkup \
   --key api.json \
   --apk /path/to/Package.apk \
@@ -36,7 +56,7 @@ apkup \
   --obbs /path/to/Expansion2.obb   # optional
 ```
 
-or the JavaScript API
+Or use the JavaScript library!
 
 ```javascript
 // typescript / modulejs
@@ -65,9 +85,10 @@ apkup
   .then(data => {
     console.log(` > ${data.packageName} version ${data.versionCode} is up!`);
   });
+
 ```
 
-## Authentication
+## 🔒 Authentication <a name = "authentication"></a>
 
 First you have to create a Google Play API Access. To do that go to the
 [Google Play Developer Console](https://play.google.com/apps/publish) and then
@@ -82,54 +103,17 @@ The created Service Account needs the following role:
 
 - Release manager
 
-## Gulp Support
+## 🎈 Usage <a name="usage"></a>
 
-The `upload` method returns a `Promise` so this package can be used in conjunction with gulp with no extra plugins needed
+See the full docs [here](https://oss.eventone.page/apkup/classes/apkup).
 
-```javascript
-gulp.task(upload, () => {
-  return publisher.upload(apk, params);
-});
-```
+## ✍️ Authors <a name = "authors"></a>
 
-## CLI Usage
+- [@nprail](https://github.com/nprail) - Maintainer
 
-```bash
-apkup --key auth.json --release-notes "release notes" --apk app.apk --obbs [OBB]
-```
+See also the list of [contributors](https://github.com/eventOneHQ/apkup/contributors) who participated in this project.
 
-#### key
+## 🎉 Acknowledgements <a name = "acknowledgement"></a>
 
-[_Required_]
-Type: `string`
-
-The path to a JSON file with the [Authentication information](#authentication)
-
-#### apk
-
-[_Required_]
-Type: `string`
-
-The path to the APK
-
-#### track
-
-Type: `string`
-
-Specify track for this release. Can be `internal`, `alpha`, `beta`, `production` or `rollout`. Default: `internal`
-
-#### release-notes
-
-Type: `string[]`
-
-A string with the format `lang=changes` where `lang` is the language code and `changes` the string that specifies the release notes
-
-#### obbs
-
-Type: `string[]`
-
-The path to 1 or 2 expansion files
-
-## API Usage
-
-See the [API docs](https://oss.eventone.page/apkup/classes/apkup).
+- The original project, [playup](https://github.com/jeduan/playup)!
+- Hat tip to anyone whose code was used

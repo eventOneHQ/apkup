@@ -27,7 +27,7 @@ jobs:
       deploy:
         provider: script
         skip_cleanup: true
-        script: echo "Nothing to do" # npx semantic-release
+        script: npx semantic-release
         on:
           branch: master
           repo: eventOneHQ/apkup

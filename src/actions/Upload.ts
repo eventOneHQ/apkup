@@ -2,9 +2,8 @@ import assert from 'assert'
 import Debug from 'debug'
 import { createReadStream } from 'fs'
 import { JWT } from 'google-auth-library'
-import { google } from 'googleapis'
-import { Edit, IEditParams } from './Edit'
-import { checkTrack } from './helpers'
+import { Edit, IEditParams } from '../Edit'
+import { checkTrack } from '../helpers'
 
 const debug = Debug('apkup:Upload')
 

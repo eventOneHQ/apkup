@@ -1,9 +1,9 @@
 import assert from 'assert'
 import { JWT } from 'google-auth-library'
 import { google } from 'googleapis'
+import { IUploadParams, Upload } from './actions/Upload'
 import { IEditParams, IEditResponse } from './Edit'
 import { parseManifest } from './helpers'
-import { IUploadParams, Upload } from './Upload'
 
 /* Object with Authentication information. */
 export interface IAuthParams {

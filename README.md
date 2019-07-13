@@ -2,7 +2,8 @@
 
 <div align="center">
 
-![npm](https://img.shields.io/npm/v/apkup.svg)
+[![npm](https://img.shields.io/npm/v/apkup.svg)](https://www.npmjs.com/package/apkup)
+[![Build Status](https://travis-ci.com/eventOneHQ/apkup.svg?branch=master)](https://travis-ci.com/eventOneHQ/apkup)
 [![GitHub Issues](https://img.shields.io/github/issues/eventOneHQ/apkup.svg)](https://github.com/eventOneHQ/apkup/issues)
 [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/eventOneHQ/apkup.svg)](https://github.com/eventOneHQ/apkup/pulls)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
@@ -46,6 +47,7 @@ npm i -D apkup
 ```
 
 ### CLI
+
 Then use the CLI:
 
 ```bash
@@ -60,6 +62,7 @@ apkup \
 You can also specify each parameter via environment variables prefixed with `APKUP_` (e.g. `APKUP_KEY` or `APKUP_APK`).
 
 ### Library
+
 Or use the JavaScript library!
 
 ```javascript

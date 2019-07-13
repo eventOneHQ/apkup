@@ -52,7 +52,7 @@ Then use the CLI:
 apkup \
   --key api.json \
   --apk /path/to/Package.apk \
-  --release-notes "en-US='lorem ipsum dolor'" \
+  --release-notes "en-US=lorem ipsum dolor" \
   --obbs /path/to/Expansion.obb \  # optional
   --obbs /path/to/Expansion2.obb   # optional
 ```

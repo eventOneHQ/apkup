@@ -29,7 +29,7 @@ jobs:
         skip_cleanup: true
         script: npx semantic-release
         on:
-          branch: master
+          branch: next
           repo: eventOneHQ/apkup
 notifications:
   email: false

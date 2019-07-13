@@ -4,7 +4,7 @@
   "description": "Publish APKs to Google Play Store",
   "main": "dist/index.js",
   "bin": {
-    "apkup": "dist/cli.js"
+    "apkup": "dist/cli/index.js"
   },
   "types": "dist/index.d.ts",
   "scripts": {

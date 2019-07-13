@@ -1,6 +1,7 @@
 import assert from 'assert'
 import { JWT } from 'google-auth-library'
 import { google } from 'googleapis'
+import { IPromoteParams, Promote } from './actions/Promote'
 import { IUploadParams, Upload } from './actions/Upload'
 import { IEditParams, IEditResponse } from './Edit'
 import { parseManifest } from './helpers'
@@ -75,5 +76,59 @@ export class Apkup {
 
     const upload = new Upload(this.client, apk, uploadParams, editParams)
     return upload.run()
+  }
+
+  /**
+   * Promote an APK from one track to another.
+   *
+   * @param {object} promoteParams Information related to the promotion.
+   * @param {string} apk The path to the APK.
+   * @param {object} editParams The package name and version code of the app.
+   *
+   * ```typescript
+   * // promote based on an APK
+   * await apkup.promote(
+   *   {
+   *     track: 'alpha'
+   *   },
+   *   './android-debug.apk'
+   * )
+   *
+   * // promote based on package name and version code
+   * await apkup.promote(
+   *   {
+   *     track: 'alpha'
+   *   },
+   *   {
+   *     packageName: 'io.event1.shared',
+   *     versionCode: 137
+   *  }
+   * )
+   * ```
+   */
+  public async promote (
+    promoteParams: IPromoteParams,
+    apk?: string,
+    editParams?: IEditParams
+  ) {
+    let edit: IEditParams
+
+    if (apk) {
+      const apkPackage = await parseManifest(apk)
+
+      edit = {
+        packageName: apkPackage.packageName,
+        versionCode: apkPackage.versionCode
+      }
+    } else if (editParams) {
+      edit = editParams
+    } else {
+      throw new Error(
+        'Either apk or package-name and version-code are required'
+      )
+    }
+
+    const promote = new Promote(this.client, edit, promoteParams)
+    return promote.run()
   }
 }

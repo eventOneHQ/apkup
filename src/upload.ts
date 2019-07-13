@@ -70,7 +70,7 @@ export class Upload extends Edit {
         editId: this.editId,
         media: {
           body: createReadStream(apk),
-          mediaType: 'application/vnd.android.package-archive'
+          mimeType: 'application/vnd.android.package-archive'
         },
         packageName: this.editParams.packageName
       })
@@ -113,7 +113,7 @@ export class Upload extends Edit {
         expansionFileType: 'main',
         media: {
           body: createReadStream(obb),
-          mediaType: 'application/octet-stream'
+          mimeType: 'application/octet-stream'
         },
         packageName: this.editParams.packageName
       },

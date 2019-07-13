@@ -33,7 +33,7 @@
   "dependencies": {
     "adbkit-apkreader": "^3.1.2",
     "debug": "^4.1.1",
-    "googleapis": "^36.0.0",
+    "googleapis": "^41.0.0",
     "ora": "^3.4.0",
     "yargs": "^13.2.4"
   },

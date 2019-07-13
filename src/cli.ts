@@ -5,7 +5,7 @@ import ora from 'ora'
 import yargs from 'yargs'
 
 import { Apkup } from './index'
-import { IUploadParams } from './upload'
+import { IUploadParams } from './Upload'
 
 const argv = yargs
   .usage('Usage: $0 [options]')

@@ -1,7 +1,9 @@
 import assert from 'assert'
 import { JWT } from 'google-auth-library'
 import { google } from 'googleapis'
-import { IUploadParams, IUploadResponse, Upload } from './upload'
+import { IEditParams, IEditResponse } from './Edit'
+import { parseManifest } from './helpers'
+import { IUploadParams, Upload } from './Upload'
 
 /* Object with Authentication information. */
 export interface IAuthParams {
@@ -44,7 +46,7 @@ export class Apkup {
   /**
    * Upload an APK to the Google Play Developer Console.
    * @param {string} apk The path to the APK.
-   * @param {object} params The params object will add additional information to this release.
+   * @param {object} uploadParams The params object will add additional information to this release.
    *
    * @returns An object with the response data.
    *
@@ -62,9 +64,16 @@ export class Apkup {
    */
   public async upload (
     apk: string,
-    params?: IUploadParams
-  ): Promise<IUploadResponse> {
-    const up = new Upload(this.client, apk, params)
-    return up.publish()
+    uploadParams?: IUploadParams
+  ): Promise<IEditResponse> {
+    const apkPackage = await parseManifest(apk)
+
+    const editParams: IEditParams = {
+      packageName: apkPackage.packageName,
+      versionCode: apkPackage.versionCode
+    }
+
+    const upload = new Upload(this.client, apk, uploadParams, editParams)
+    return upload.run()
   }
 }

@@ -1,18 +1,16 @@
-import ApkReader from 'adbkit-apkreader'
 import assert from 'assert'
 import Debug from 'debug'
 import { createReadStream } from 'fs'
 import { JWT } from 'google-auth-library'
 import { google } from 'googleapis'
+import { Edit, IEditParams } from './Edit'
+import { checkTrack } from './helpers'
 
-const debug = Debug('apkup')
-const publisher = google.androidpublisher({
-  version: 'v3'
-})
+const debug = Debug('apkup:Upload')
 
 export interface IUploadParams {
   // tslint:disable-next-line: max-line-length
-  /** Specify track for this release. Can be `internal`, `alpha`, `beta`, `production` or `rollout`. Default: `internal` */
+  /** Specify track for this release. Can be one of the [[tracks]]. Default: `internal` */
   track?: string
   /** An array of objects that specifies changes in this version. Each object has a `language` and `text`. */
   releaseNotes?: IReleaseNotes[]
@@ -20,114 +18,61 @@ export interface IUploadParams {
   obbs?: string[]
 }
 
-export interface IUploadResponse {
-  /** ID of the package that was uploaded. */
-  packageName?: string
-  /** Version code of the package that was uploaded. */
-  versionCode?: number
-}
-
 export interface IReleaseNotes {
-  /** Language of the release notes */
+  /** Language of the release notes. Example: `en-US` */
   language: string
   /** Text of the release notes */
   text: any
 }
 
 /**
- * Create an Upload
- * @ignore
+ * Create an Upload to Google Play!
  */
-export class Upload {
-  /**
-   * Available tracks
-   */
-  public tracks = ['internal', 'alpha', 'beta', 'production', 'rollout']
-
-  public packageName?: string
-  public versionCode?: number
-  public editId?: string
-
-  private client: JWT
-  private apk: any[]
-  private track: string
-  private obbs: string[]
+export class Upload extends Edit {
+  private uploadParams: IUploadParams
+  private apk: string[]
 
   private versionCodes: any[] = []
-  private releaseNotes: IReleaseNotes[] = []
 
-  constructor (client: JWT, apk: string | string[], params: IUploadParams = {}) {
-    assert(client, 'I require a client')
-    assert(apk, 'I require an APK route')
-    if (params.track) {
-      assert(this.tracks.includes(params.track), 'Unknown track')
+  constructor (
+    client: JWT,
+    apk: string | string[],
+    uploadParams: IUploadParams = {},
+    editParams: IEditParams
+  ) {
+    super(client, editParams)
+
+    assert(apk, 'I require an APK file')
+    if (uploadParams.track) {
+      uploadParams.track = uploadParams.track.toLowerCase()
+
+      assert(checkTrack(uploadParams.track), 'Unknown track')
     }
 
-    this.client = client
-
     this.apk = typeof apk === 'string' ? [apk] : apk
-    this.track = params.track || 'internal'
-    this.obbs = params.obbs || []
-    this.releaseNotes = params.releaseNotes || []
+
+    this.uploadParams = uploadParams
+    this.uploadParams.track = uploadParams.track || 'internal'
+    this.uploadParams.obbs = uploadParams.obbs || []
+    this.uploadParams.releaseNotes = uploadParams.releaseNotes || []
   }
 
-  public async publish (): Promise<IUploadResponse> {
-    await this.parseManifest()
-    await this.authenticate()
-    await this.createEdit()
+  public async makeEdits () {
     await this.uploadAPK()
     await this.uploadOBBs()
     await this.assignTrack()
-    await this.commitChanges()
-
-    return {
-      packageName: this.packageName,
-      versionCode: this.versionCode
-    }
-  }
-
-  private async parseManifest () {
-    debug('> Parsing manifest')
-    const reader = await ApkReader.open(this.apk[0])
-    const manifest = await reader.readManifest()
-
-    this.packageName = manifest.package
-    this.versionCode = manifest.versionCode
-    debug(`> Detected package name ${this.packageName}`)
-    debug(`> Detected version code ${this.versionCode}`)
-  }
-
-  private async authenticate () {
-    debug('> Authenticating')
-    await this.client.authorize()
-    debug('> Authenticated successfully')
-  }
-
-  private async createEdit () {
-    debug('> Creating edit')
-    const edit = await publisher.edits.insert({
-      auth: this.client,
-      packageName: this.packageName
-    })
-
-    if (!edit) {
-      throw new Error('Unable to create edit')
-    }
-    debug(`> Created edit with id ${edit.data.id}`)
-    this.editId = edit.data.id
   }
 
   private async uploadAPK () {
     debug('> Uploading release')
     const uploads = this.apk.map(async (apk) => {
-      const uploadJob = await publisher.edits.apks.upload({
-        auth: this.client,
+      const uploadJob = await this.publisher.edits.apks.upload({
         editId: this.editId,
         media: {
           body: createReadStream(apk),
           mediaType: 'application/vnd.android.package-archive'
         },
-        packageName: this.packageName
+        packageName: this.editParams.packageName
       })
 
       debug(
@@ -143,71 +88,62 @@ export class Upload {
   }
 
   private async uploadOBBs () {
-    if (!this.obbs || !Array.isArray(this.obbs) || !this.obbs.length) {
+    if (
+      !this.uploadParams.obbs ||
+      !Array.isArray(this.uploadParams.obbs) ||
+      !this.uploadParams.obbs.length
+    ) {
       return
     }
 
-    debug(`> Uploading ${this.obbs.length} expansion file(s)`)
+    debug(`> Uploading ${this.uploadParams.obbs.length} expansion file(s)`)
 
-    return Promise.all(this.obbs.map(async (obb) => this.uploadOBB(obb)))
+    return Promise.all(
+      this.uploadParams.obbs.map(async (obb) => this.uploadOBB(obb))
+    )
   }
 
   private async uploadOBB (obb: string) {
     debug(`> Uploading expansion file ${obb}`)
 
-    return publisher.edits.expansionfiles.upload(
+    return this.publisher.edits.expansionfiles.upload(
       {
-        apkVersionCode: this.versionCode,
-        auth: this.client,
+        apkVersionCode: this.editParams.versionCode,
         editId: this.editId,
         expansionFileType: 'main',
         media: {
           body: createReadStream(obb),
           mediaType: 'application/octet-stream'
         },
-        packageName: this.packageName
+        packageName: this.editParams.packageName
       },
       {}
     )
   }
 
   private async assignTrack () {
-    debug(`> Assigning APK to ${this.track} track`)
-    const trackUpdate = await publisher.edits.tracks.update(
+    debug(`> Assigning APK to ${this.uploadParams.track} track`)
+    const trackUpdate = await this.publisher.edits.tracks.update(
       {
-        auth: this.client,
         editId: this.editId,
-        packageName: this.packageName,
+        packageName: this.editParams.packageName,
         requestBody: {
           releases: [
             {
-              releaseNotes: this.releaseNotes,
+              releaseNotes: this.uploadParams.releaseNotes,
               status: 'completed',
               versionCodes: this.versionCodes
             }
           ],
-          track: this.track
+          track: this.uploadParams.track
         },
-        track: this.track
+        track: this.uploadParams.track
       },
       {}
     )
 
-    debug(`> Assigned APK to ${this.track} track`)
+    debug(`> Assigned APK to ${this.uploadParams.track} track`)
 
     return trackUpdate
-  }
-
-  private async commitChanges () {
-    debug('> Commiting changes')
-    const editCommit = await publisher.edits.commit({
-      auth: this.client,
-      editId: this.editId,
-      packageName: this.packageName
-    })
-
-    debug('> Commited changes')
-
-    return editCommit
   }
 }

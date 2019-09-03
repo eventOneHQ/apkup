@@ -14,9 +14,12 @@ export interface IPackageManifest {
  * Parse the manifest of an APK file
  * @param apk Path to the APK file
  */
-export const parseManifest = async (apk: string): Promise<IPackageManifest> => {
+export const parseManifest = async (
+  apk: string | string[]
+): Promise<IPackageManifest> => {
   debug('> Parsing manifest')
-  const reader = await ApkReader.open(apk)
+  const apkFile = typeof apk !== 'string' ? apk[0] : apk
+  const reader = await ApkReader.open(apkFile)
   const manifest = await reader.readManifest()
 
   debug(`> Detected package name ${manifest.package}`)

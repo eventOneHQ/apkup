@@ -46,13 +46,13 @@ export class Apkup {
 
   /**
    * Upload an APK to the Google Play Developer Console.
-   * @param {string} apk The path to the APK.
+   * @param {string[]} apks The path to the APK.
    * @param {object} uploadParams The params object will add additional information to this release.
    *
    * @returns An object with the response data.
    *
    * ```typescript
-   * const upload = await apkup.upload('./android-debug.apk', {
+   * const upload = await apkup.upload([ './android-debug.apk' ], {
    *   track: 'beta',
    *   releaseNotes: [
    *     {
@@ -64,17 +64,17 @@ export class Apkup {
    * ```
    */
   public async upload (
-    apk: string | string[],
+    apks: string[],
     uploadParams?: IUploadParams
   ): Promise<IEditResponse> {
-    const apkPackage = await parseManifest(apk)
+    const apkPackage = await parseManifest(apks[0])
 
     const editParams: IEditParams = {
       packageName: apkPackage.packageName,
       versionCode: apkPackage.versionCode
     }
 
-    const upload = new Upload(this.client, apk, uploadParams, editParams)
+    const upload = new Upload(this.client, apks, uploadParams, editParams)
     return upload.run()
   }
 
@@ -108,7 +108,7 @@ export class Apkup {
    */
   public async promote (
     promoteParams: IPromoteParams,
-    apk?: string | string[],
+    apk?: string,
     editParams?: IEditParams
   ) {
     let edit: IEditParams

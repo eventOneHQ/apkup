@@ -30,6 +30,11 @@ const argv = yargs
     type: 'string',
     demandOption: true
   })
+  .option('config', {
+    alias: 'c',
+    config: true
+  })
+  .default('config', 'apkup.json')
   .config('config', 'Path to a JSON config file', (configPath: string) => {
     const config = readJson(configPath)
     if (config.key) {

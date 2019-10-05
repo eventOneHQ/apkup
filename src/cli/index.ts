@@ -20,7 +20,8 @@ const argv = yargs
   })
   .option('apk', {
     alias: 'a',
-    describe: 'Path to the APK file'
+    describe: 'Path to the APK file',
+    type: 'array'
   })
   .config(
     'key',

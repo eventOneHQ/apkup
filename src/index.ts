@@ -64,7 +64,7 @@ export class Apkup {
    * ```
    */
   public async upload (
-    apk: string,
+    apk: string | string[],
     uploadParams?: IUploadParams
   ): Promise<IEditResponse> {
     const apkPackage = await parseManifest(apk)
@@ -108,7 +108,7 @@ export class Apkup {
    */
   public async promote (
     promoteParams: IPromoteParams,
-    apk?: string,
+    apk?: string | string[],
     editParams?: IEditParams
   ) {
     let edit: IEditParams

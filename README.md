@@ -71,7 +71,7 @@ import { Apkup } = from 'apkup';
 // or commonjs
 const { Apkup } = require('apkup');
 
-const apkup = Apkup({
+const apkup = new Apkup({
   client_email: '',
   private_key: ''
 });

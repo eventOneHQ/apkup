@@ -104,10 +104,9 @@ export class Upload extends Edit {
           },
           packageName: this.editParams.packageName
         },
-          {}
+        {}
       )
     }
-    return Promise.resolve()
   }
 
   private async uploadOBBs () {

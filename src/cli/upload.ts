@@ -21,6 +21,11 @@ export const upload = {
         describe: `A string with the format 'lang=changes'`,
         type: 'array'
       })
+      .option('deobfuscation', {
+        alias: 'd',
+        describe: 'Path to optional deobfuscation file',
+        type: 'string'
+      })
       .option('obbs', {
         alias: 'o',
         describe: 'Path to optional expansion files (max 2)',
@@ -32,6 +37,7 @@ export const upload = {
   desc: 'Upload an APK',
   handler: (argv) => {
     const options: IUploadParams = {
+      deobfuscation: argv.deobfuscation,
       obbs: argv.obbs,
       releaseNotes: [],
       track: argv.track

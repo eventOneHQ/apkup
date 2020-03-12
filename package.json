@@ -48,6 +48,15 @@
     "typescript": "^3.8.3"
   },
   "release": {
-    "branches": "next"
+    "branches": [
+      {
+        "name": "next"
+      },
+      {
+        "name": "beta",
+        "channel": "beta",
+        "prerelease": true
+      }
+    ]
   }
 }

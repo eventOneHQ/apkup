@@ -15,7 +15,7 @@ export interface IUploadParams {
   releaseNotes?: IReleaseNotes[]
   /** An array that specifies the paths to the expansion files (OBBs) for this release. */
   obbs?: string[]
-  /** An array that specifies the paths to the deobfuscation files for this release. */
+  /** A paths to the deobfuscation file for this release. */
   deobfuscation?: string
 }
 

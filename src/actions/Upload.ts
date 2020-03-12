@@ -15,6 +15,8 @@ export interface IUploadParams {
   releaseNotes?: IReleaseNotes[]
   /** An array that specifies the paths to the expansion files (OBBs) for this release. */
   obbs?: string[]
+  /** A paths to the deobfuscation file for this release. */
+  deobfuscation?: string
 }
 
 export interface IReleaseNotes {
@@ -54,12 +56,14 @@ export class Upload extends Edit {
     this.uploadParams.track = uploadParams.track || 'internal'
     this.uploadParams.obbs = uploadParams.obbs || []
     this.uploadParams.releaseNotes = uploadParams.releaseNotes || []
+    this.uploadParams.deobfuscation = uploadParams.deobfuscation
   }
 
   public async makeEdits () {
     await this.uploadAPK()
     await this.uploadOBBs()
     await this.assignTrack()
+    await this.uploadDeobfuscation()
   }
 
   private async uploadAPK () {
@@ -84,6 +88,25 @@ export class Upload extends Edit {
       return uploadJob
     })
     return Promise.all(uploads)
+  }
+
+  private async uploadDeobfuscation () {
+    debug('> Uploading deobfuscation')
+    if (this.uploadParams.deobfuscation) {
+      return this.publisher.edits.deobfuscationfiles.upload(
+        {
+          apkVersionCode: this.editParams.versionCode,
+          deobfuscationFileType: 'proguard',
+          editId: this.editId,
+          media: {
+            body: createReadStream(this.uploadParams.deobfuscation),
+            mimeType: 'application/octet-stream'
+          },
+          packageName: this.editParams.packageName
+        },
+        {}
+      )
+    }
   }
 
   private async uploadOBBs () {

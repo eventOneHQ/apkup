@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - 'node'
+  - "node"
 cache:
   directories:
     - ~/.npm
@@ -25,11 +25,17 @@ jobs:
     - stage: release
       node_js: lts/*
       deploy:
-        provider: script
-        skip_cleanup: true
-        script: npx semantic-release
-        on:
-          branch: next
-          repo: eventOneHQ/apkup
+        - provider: script
+          skip_cleanup: true
+          script: npx semantic-release
+          on:
+            branch: next
+            repo: eventOneHQ/apkup
+        - provider: script
+          skip_cleanup: true
+          script: npx semantic-release
+          on:
+            branch: beta
+            repo: eventOneHQ/apkup
 notifications:
   email: false

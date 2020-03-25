@@ -31,26 +31,26 @@ export interface IReleaseNotes {
  */
 export class Upload extends Edit {
   private uploadParams: IUploadParams
-  private apk: string[]
+  private apks: string[]
 
   private versionCodes: any[] = []
 
   constructor (
     client: JWT,
-    apk: string | string[],
+    apks: string[],
     uploadParams: IUploadParams = {},
     editParams: IEditParams
   ) {
     super(client, editParams)
 
-    assert(apk, 'I require an APK file')
+    assert(apks, 'I require an APK file')
     if (uploadParams.track) {
       uploadParams.track = uploadParams.track.toLowerCase()
 
       assert(checkTrack(uploadParams.track), 'Unknown track')
     }
 
-    this.apk = typeof apk === 'string' ? [apk] : apk
+    this.apks = apks
 
     this.uploadParams = uploadParams
     this.uploadParams.track = uploadParams.track || 'internal'
@@ -68,7 +68,7 @@ export class Upload extends Edit {
 
   private async uploadAPK () {
     debug('> Uploading release')
-    const uploads = this.apk.map(async (apk) => {
+    const uploads = this.apks.map(async (apk) => {
       const uploadJob = await this.publisher.edits.apks.upload({
         editId: this.editId,
         media: {

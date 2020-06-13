@@ -33,19 +33,20 @@
   "dependencies": {
     "adbkit-apkreader": "^3.2.0",
     "debug": "^4.1.1",
-    "googleapis": "^41.0.0",
-    "ora": "^3.4.0",
-    "yargs": "^13.3.0"
+    "googleapis": "^52.1.0",
+    "node-aab-parser": "^1.0.0",
+    "ora": "^4.0.4",
+    "yargs": "^15.3.1"
   },
   "devDependencies": {
     "@types/debug": "^4.1.5",
-    "@types/node": "^12.12.29",
-    "npm-audit-html": "^1.4.0",
-    "semantic-release": "^17.0.4",
+    "@types/node": "^12.12.47",
+    "npm-audit-html": "^1.4.1",
+    "semantic-release": "^17.0.8",
     "tslint": "^5.20.1",
     "tslint-config-standard": "^8.0.1",
-    "typedoc": "^0.16.11",
-    "typescript": "^3.8.3"
+    "typedoc": "^0.17.7",
+    "typescript": "^3.9.5"
   },
   "release": {
     "branches": [

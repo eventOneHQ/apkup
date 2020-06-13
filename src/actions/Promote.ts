@@ -124,7 +124,7 @@ export class Promote extends Edit {
   }
 
   private async removePreviousTrack () {
-    const oldTrack = this.previousTrack && this.previousTrack.track
+    const oldTrack = this.previousTrack?.track!
 
     debug(`> Removing APK from ${oldTrack} track`)
 

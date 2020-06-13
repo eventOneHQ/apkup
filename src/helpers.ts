@@ -1,5 +1,7 @@
 import ApkReader from 'adbkit-apkreader'
 import Debug from 'debug'
+import { readManifest as readAabManifest } from 'node-aab-parser'
+import { extname, resolve } from 'path'
 
 const debug = Debug('apkup:helpers')
 
@@ -18,17 +20,35 @@ export const parseManifest = async (
   apk: string | string[]
 ): Promise<IPackageManifest> => {
   debug('> Parsing manifest')
-  const apkFile = typeof apk !== 'string' ? apk[0] : apk
-  const reader = await ApkReader.open(apkFile)
-  const manifest = await reader.readManifest()
+  const apkFile = resolve(typeof apk !== 'string' ? apk[0] : apk)
 
-  debug(`> Detected package name ${manifest.package}`)
+  let manifest: IPackageManifest
+
+  debug(`> File path ${apkFile}`)
+  const ext = extname(apkFile)
+  if (ext === '.apk') {
+    const reader = await ApkReader.open(apkFile)
+    const manifestResponse = await reader.readManifest()
+
+    manifest = {
+      packageName: manifestResponse.package,
+      versionCode: manifestResponse.versionCode
+    }
+  } else if (ext === '.aab') {
+    const manifestResponse = await readAabManifest(apkFile)
+
+    manifest = {
+      packageName: manifestResponse.packageName,
+      versionCode: manifestResponse.versionCode
+    }
+  } else {
+    throw new Error('The file must be an APK or AAB.')
+  }
+
+  debug(`> Detected package name ${manifest.packageName}`)
   debug(`> Detected version code ${manifest.versionCode}`)
 
-  return {
-    packageName: manifest.package,
-    versionCode: manifest.versionCode
-  }
+  return manifest
 }
 
 /**

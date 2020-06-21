@@ -54,6 +54,7 @@ Then use the CLI:
 apkup \
   --key api.json \
   --apk /path/to/Package.apk \
+  --deobfuscation /path/to/mapping.txt \ # optional
   --release-notes "en-US=lorem ipsum dolor" \
   --obbs /path/to/Expansion.obb \  # optional
   --obbs /path/to/Expansion2.obb   # optional
@@ -71,7 +72,7 @@ import { Apkup } = from 'apkup';
 // or commonjs
 const { Apkup } = require('apkup');
 
-const apkup = Apkup({
+const apkup = new Apkup({
   client_email: '',
   private_key: ''
 });

@@ -2,6 +2,7 @@ import assert from 'assert'
 import Debug from 'debug'
 import { createReadStream } from 'fs'
 import { JWT } from 'google-auth-library'
+import { extname } from 'path'
 import { Edit, IEditParams } from '../Edit'
 import { checkTrack } from '../helpers'
 
@@ -15,6 +16,8 @@ export interface IUploadParams {
   releaseNotes?: IReleaseNotes[]
   /** An array that specifies the paths to the expansion files (OBBs) for this release. */
   obbs?: string[]
+  /** A paths to the deobfuscation file for this release. */
+  deobfuscation?: string
 }
 
 export interface IReleaseNotes {
@@ -54,36 +57,76 @@ export class Upload extends Edit {
     this.uploadParams.track = uploadParams.track || 'internal'
     this.uploadParams.obbs = uploadParams.obbs || []
     this.uploadParams.releaseNotes = uploadParams.releaseNotes || []
+    this.uploadParams.deobfuscation = uploadParams.deobfuscation
   }
 
   public async makeEdits () {
-    await this.uploadAPK()
+    await this.uploadFiles()
     await this.uploadOBBs()
     await this.assignTrack()
+    await this.uploadDeobfuscation()
   }
 
-  private async uploadAPK () {
+  private async uploadFiles () {
     debug('> Uploading release')
-    const uploads = this.apk.map(async (apk) => {
-      const uploadJob = await this.publisher.edits.apks.upload({
-        editId: this.editId,
-        media: {
-          body: createReadStream(apk),
-          mimeType: 'application/vnd.android.package-archive'
-        },
-        packageName: this.editParams.packageName
-      })
+    const uploads = this.apk.map(async (file) => {
+      let uploadJob: any
 
-      debug(
-        `> Uploaded ${apk} with version code ${
-          uploadJob.data.versionCode
-        } and SHA1 ${uploadJob.data.binary && uploadJob.data.binary.sha1}`
-      )
+      const ext = extname(file)
+      if (ext === '.apk') {
+        uploadJob = await this.publisher.edits.apks.upload({
+          editId: this.editId,
+          media: {
+            body: createReadStream(file),
+            mimeType: 'application/octet-stream'
+          },
+          packageName: this.editParams.packageName
+        })
+
+        debug(
+          `> Uploaded ${file} with version code ${
+            uploadJob.data.versionCode
+          } and SHA1 ${uploadJob.data.binary && uploadJob.data.binary.sha1}`
+        )
+      } else if (ext === '.aab') {
+        uploadJob = await this.publisher.edits.bundles.upload({
+          editId: this.editId,
+          media: {
+            body: createReadStream(file),
+            mimeType: 'application/octet-stream'
+          },
+          packageName: this.editParams.packageName
+        })
+
+        debug(
+          `> Uploaded ${file} with version code ${uploadJob.data.versionCode} and SHA1 ${uploadJob.data.sha1}`
+        )
+      }
+
       this.versionCodes.push(uploadJob.data.versionCode)
 
       return uploadJob
     })
     return Promise.all(uploads)
+  }
+
+  private async uploadDeobfuscation () {
+    debug('> Uploading deobfuscation')
+    if (this.uploadParams.deobfuscation) {
+      return this.publisher.edits.deobfuscationfiles.upload(
+        {
+          apkVersionCode: this.editParams.versionCode,
+          deobfuscationFileType: 'proguard',
+          editId: this.editId,
+          media: {
+            body: createReadStream(this.uploadParams.deobfuscation),
+            mimeType: 'application/octet-stream'
+          },
+          packageName: this.editParams.packageName
+        },
+        {}
+      )
+    }
   }
 
   private async uploadOBBs () {

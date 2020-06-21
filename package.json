@@ -31,23 +31,33 @@
   },
   "homepage": "https://github.com/eventOneHQ/apkup",
   "dependencies": {
-    "adbkit-apkreader": "^3.1.2",
+    "adbkit-apkreader": "^3.2.0",
     "debug": "^4.1.1",
-    "googleapis": "^41.0.0",
-    "ora": "^3.4.0",
-    "yargs": "^13.2.4"
+    "googleapis": "^52.1.0",
+    "node-aab-parser": "^1.0.0",
+    "ora": "^4.0.4",
+    "yargs": "^15.3.1"
   },
   "devDependencies": {
-    "@types/debug": "^4.1.4",
-    "@types/node": "^12.6.2",
-    "npm-audit-html": "^1.3.3",
-    "semantic-release": "^15.13.24",
-    "tslint": "^5.18.0",
+    "@types/debug": "^4.1.5",
+    "@types/node": "^12.12.47",
+    "npm-audit-html": "^1.4.1",
+    "semantic-release": "^17.0.8",
+    "tslint": "^5.20.1",
     "tslint-config-standard": "^8.0.1",
-    "typedoc": "^0.15.0",
-    "typescript": "^3.5.3"
+    "typedoc": "^0.17.7",
+    "typescript": "^3.9.5"
   },
   "release": {
-    "branch": "next"
+    "branches": [
+      {
+        "name": "next"
+      },
+      {
+        "name": "beta",
+        "channel": "beta",
+        "prerelease": true
+      }
+    ]
   }
 }

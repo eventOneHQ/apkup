@@ -105,7 +105,7 @@ export class Edit {
       throw new Error('Unable to create edit')
     }
     debug(`> Created edit with id ${edit.data.id}`)
-    this.editId = edit.data.id
+    this.editId = edit.data.id!
   }
 
   private async commitChanges () {

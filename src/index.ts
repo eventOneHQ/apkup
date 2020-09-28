@@ -63,18 +63,19 @@ export class Apkup {
    * })
    * ```
    */
-  public async upload (
-    apk: string | string[],
-    uploadParams?: IUploadParams
-  ): Promise<IEditResponse> {
-    const apkPackage = await parseManifest(apk)
+  public async upload (uploadParams: IUploadParams): Promise<IEditResponse> {
+    const file = uploadParams.files[0]?.file
+
+    assert(file, 'At least one file is required')
+
+    const manifest = await parseManifest(file)
 
     const editParams: IEditParams = {
-      packageName: apkPackage.packageName,
-      versionCode: apkPackage.versionCode
+      packageName: manifest.packageName,
+      versionCode: manifest.versionCode
     }
 
-    const upload = new Upload(this.client, apk, uploadParams, editParams)
+    const upload = new Upload(this.client, uploadParams, editParams)
     return upload.run()
   }
 

@@ -7,17 +7,22 @@ import { Edit, IEditParams } from '../Edit'
 import { checkTrack } from '../helpers'
 
 const debug = Debug('apkup:Upload')
+export interface IUploadFile {
+  /** The APK or AAB file to upload. */
+  file: string
+  /** A paths to the deobfuscation file for this release. */
+  deobfuscation?: string
+  /** An array that specifies the paths to the expansion files (OBBs) for this release. */
+  obbs?: string[]
+}
 
 export interface IUploadParams {
-  // tslint:disable-next-line: max-line-length
-  /** Specify track for this release. Can be one of the [[tracks]]. Default: `internal` */
+  /** An array of objects that specifies the files to upload for this release. */
+  files: IUploadFile[]
+  /** Specify track for this release. Default: `internal` */
   track?: string
   /** An array of objects that specifies changes in this version. Each object has a `language` and `text`. */
   releaseNotes?: IReleaseNotes[]
-  /** An array that specifies the paths to the expansion files (OBBs) for this release. */
-  obbs?: string[]
-  /** A paths to the deobfuscation file for this release. */
-  deobfuscation?: string
 }
 
 export interface IReleaseNotes {
@@ -32,59 +37,54 @@ export interface IReleaseNotes {
  */
 export class Upload extends Edit {
   private uploadParams: IUploadParams
-  private apk: string[]
 
   private versionCodes: any[] = []
 
   constructor (
     client: JWT,
-    apk: string | string[],
-    uploadParams: IUploadParams = {},
+    uploadParams: IUploadParams,
     editParams: IEditParams
   ) {
     super(client, editParams)
 
-    assert(apk, 'I require an APK file')
+    assert(
+      uploadParams.files.length > 0,
+      'I require at least one file to upload file'
+    )
     if (uploadParams.track) {
       uploadParams.track = uploadParams.track.toLowerCase()
 
       assert(checkTrack(uploadParams.track), 'Unknown track')
     }
 
-    this.apk = typeof apk === 'string' ? [apk] : apk
-
     this.uploadParams = uploadParams
     this.uploadParams.track = uploadParams.track || 'internal'
-    this.uploadParams.obbs = uploadParams.obbs || []
     this.uploadParams.releaseNotes = uploadParams.releaseNotes || []
-    this.uploadParams.deobfuscation = uploadParams.deobfuscation
   }
 
   public async makeEdits () {
     await this.uploadFiles()
-    await this.uploadOBBs()
     await this.assignTrack()
-    await this.uploadDeobfuscation()
   }
 
   private async uploadFiles () {
     debug('> Uploading release')
-    const uploads = this.apk.map(async (file) => {
+    const uploads = this.uploadParams.files.map(async (fileObject) => {
       let uploadJob: any
 
-      const ext = extname(file)
+      const ext = extname(fileObject.file)
       if (ext === '.apk') {
         uploadJob = await this.publisher.edits.apks.upload({
           editId: this.editId,
           media: {
-            body: createReadStream(file),
+            body: createReadStream(fileObject.file),
             mimeType: 'application/octet-stream'
           },
           packageName: this.editParams.packageName
         })
 
         debug(
-          `> Uploaded ${file} with version code ${
+          `> Uploaded ${fileObject.file} with version code ${
             uploadJob.data.versionCode
           } and SHA1 ${uploadJob.data.binary && uploadJob.data.binary.sha1}`
         )
@@ -92,65 +92,71 @@ export class Upload extends Edit {
         uploadJob = await this.publisher.edits.bundles.upload({
           editId: this.editId,
           media: {
-            body: createReadStream(file),
+            body: createReadStream(fileObject.file),
             mimeType: 'application/octet-stream'
           },
           packageName: this.editParams.packageName
         })
 
         debug(
-          `> Uploaded ${file} with version code ${uploadJob.data.versionCode} and SHA1 ${uploadJob.data.sha1}`
+          `> Uploaded ${fileObject.file} with version code ${uploadJob.data.versionCode} and SHA1 ${uploadJob.data.sha1}`
         )
       }
 
-      this.versionCodes.push(uploadJob.data.versionCode)
+      const versionCode: number = uploadJob.data.versionCode
+      this.versionCodes.push(versionCode)
+
+      if (fileObject.obbs) {
+        await this.uploadOBBs(fileObject.obbs, versionCode)
+      }
+
+      if (fileObject.deobfuscation) {
+        await this.uploadDeobfuscation(fileObject.deobfuscation, versionCode)
+      }
 
       return uploadJob
     })
     return Promise.all(uploads)
   }
 
-  private async uploadDeobfuscation () {
-    debug('> Uploading deobfuscation')
-    if (this.uploadParams.deobfuscation) {
-      return this.publisher.edits.deobfuscationfiles.upload(
-        {
-          apkVersionCode: this.editParams.versionCode,
-          deobfuscationFileType: 'proguard',
-          editId: this.editId,
-          media: {
-            body: createReadStream(this.uploadParams.deobfuscation),
-            mimeType: 'application/octet-stream'
-          },
-          packageName: this.editParams.packageName
+  private async uploadDeobfuscation (
+    deobfuscation: string,
+    versionCode: number
+  ) {
+    debug(`> Uploading deobfuscation for ${versionCode}`)
+    return this.publisher.edits.deobfuscationfiles.upload(
+      {
+        apkVersionCode: versionCode,
+        deobfuscationFileType: 'proguard',
+        editId: this.editId,
+        media: {
+          body: createReadStream(deobfuscation),
+          mimeType: 'application/octet-stream'
         },
-        {}
-      )
-    }
-  }
-
-  private async uploadOBBs () {
-    if (
-      !this.uploadParams.obbs ||
-      !Array.isArray(this.uploadParams.obbs) ||
-      !this.uploadParams.obbs.length
-    ) {
-      return
-    }
-
-    debug(`> Uploading ${this.uploadParams.obbs.length} expansion file(s)`)
-
-    return Promise.all(
-      this.uploadParams.obbs.map(async (obb) => this.uploadOBB(obb))
+        packageName: this.editParams.packageName
+      },
+      {}
     )
   }
 
-  private async uploadOBB (obb: string) {
-    debug(`> Uploading expansion file ${obb}`)
+  private async uploadOBBs (obbs: string[], versionCode: number) {
+    if (!obbs || !Array.isArray(obbs) || !obbs.length) {
+      return
+    }
+
+    debug(`> Uploading ${obbs.length} expansion file(s) for ${versionCode}`)
+
+    return Promise.all(
+      obbs.map(async (obb) => this.uploadOBB(obb, versionCode))
+    )
+  }
+
+  private async uploadOBB (obb: string, versionCode: number) {
+    debug(`> Uploading expansion file ${obb} for ${versionCode}`)
 
     return this.publisher.edits.expansionfiles.upload(
       {
-        apkVersionCode: this.editParams.versionCode,
+        apkVersionCode: versionCode,
         editId: this.editId,
         expansionFileType: 'main',
         media: {

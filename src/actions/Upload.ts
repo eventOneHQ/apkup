@@ -10,14 +10,14 @@ const debug = Debug('apkup:Upload')
 export interface IUploadFile {
   /** The APK or AAB file to upload. */
   file: string
-  /** A paths to the deobfuscation file for this release. */
+  /** A path to the deobfuscation file for this APK/AAB. */
   deobfuscation?: string
-  /** An array that specifies the paths to the expansion files (OBBs) for this release. */
+  /** An array that specifies the paths to the expansion files (OBBs) for this APK/AAB. */
   obbs?: string[]
 }
 
 export interface IUploadParams {
-  /** An array of objects that specifies the files to upload for this release. */
+  /** An array of objects that specify the files to upload for this release. */
   files: IUploadFile[]
   /** Specify track for this release. Default: `internal` */
   track?: string
@@ -47,18 +47,10 @@ export class Upload extends Edit {
   ) {
     super(client, editParams)
 
-    assert(
-      uploadParams.files.length > 0,
-      'I require at least one file to upload file'
-    )
-    if (uploadParams.track) {
-      uploadParams.track = uploadParams.track.toLowerCase()
-
-      assert(checkTrack(uploadParams.track), 'Unknown track')
-    }
+    assert(uploadParams?.files[0]?.file, 'At least one file is required')
 
     this.uploadParams = uploadParams
-    this.uploadParams.track = uploadParams.track || 'internal'
+    this.uploadParams.track = uploadParams?.track?.toLowerCase() || 'internal'
     this.uploadParams.releaseNotes = uploadParams.releaseNotes || []
   }
 

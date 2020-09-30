@@ -4,7 +4,6 @@ import { createReadStream } from 'fs'
 import { JWT } from 'google-auth-library'
 import { extname } from 'path'
 import { Edit, IEditParams } from '../Edit'
-import { checkTrack } from '../helpers'
 
 const debug = Debug('apkup:Upload')
 export interface IUploadFile {

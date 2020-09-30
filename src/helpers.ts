@@ -50,24 +50,3 @@ export const parseManifest = async (
 
   return manifest
 }
-
-/**
- * Available tracks
- */
-export const tracks: string[] = [
-  'internal',
-  'alpha',
-  'beta',
-  'production',
-  'rollout'
-]
-
-/**
- * Check if a track is valid
- * @param track Name of the track to check
- *
- * @returns Does the track exits?
- */
-export const checkTrack = (track: string): boolean => {
-  return tracks.includes(track)
-}

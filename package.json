@@ -31,10 +31,8 @@
   },
   "homepage": "https://github.com/eventOneHQ/apkup",
   "dependencies": {
-    "adbkit-apkreader": "^3.2.0",
     "debug": "^4.1.1",
     "googleapis": "^52.1.0",
-    "node-aab-parser": "^1.0.0",
     "ora": "^4.0.4",
     "yargs": "^15.4.1"
   },

@@ -4,7 +4,6 @@ import { google } from 'googleapis'
 import { IPromoteParams, Promote } from './actions/Promote'
 import { IUploadParams, Upload } from './actions/Upload'
 import { IEditParams, IEditResponse } from './Edit'
-import { parseManifest } from './helpers'
 
 /* Object with Authentication information. */
 export interface IAuthParams {
@@ -46,59 +45,48 @@ export class Apkup {
 
   /**
    * Upload a release to the Google Play Developer Console.
-   * @param {object} params The params object includes the information for this release.
+   * @param {object} uploadParams The params object includes the information for this release.
+   * @param {object} editParams The package name of the app.
    *
    * @returns An object with the response data.
    *
    * ```typescript
-   * const upload = await apkup.upload({
-   *   files: [
-   *     {
-   *       file: './android-debug.apk'
-   *     }
-   *   ],
-   *   track: 'beta',
-   *   releaseNotes: [
-   *     {
-   *       language: 'en-US',
-   *       text: 'Minor bug fixes...'
-   *     }
-   *   ]
-   * })
+   * const upload = await apkup.upload(
+   *   {
+   *     files: [
+   *       {
+   *         file: './android-debug.apk'
+   *       }
+   *     ],
+   *     track: 'beta',
+   *     releaseNotes: [
+   *       {
+   *         language: 'en-US',
+   *         text: 'Minor bug fixes...'
+   *       }
+   *     ]
+   *   },
+   *   {
+   *     packageName: 'io.event1.shared'
+   *   }
+   * )
    * ```
    */
-  public async upload (params: IUploadParams): Promise<IEditResponse> {
-    const file = params.files[0]?.file
-
-    assert(file, 'At least one file is required')
-
-    const manifest = await parseManifest(file)
-
-    const editParams: IEditParams = {
-      packageName: manifest.packageName
-    }
-
-    const upload = new Upload(this.client, params, editParams)
+  public async upload (
+    uploadParams: IUploadParams,
+    editParams: IEditParams
+  ): Promise<IEditResponse> {
+    const upload = new Upload(this.client, uploadParams, editParams)
     return upload.run()
   }
 
   /**
-   * Promote an APK from one track to another.
+   * Promote a release from one track to another.
    *
    * @param {object} promoteParams Information related to the promotion.
-   * @param {string} apk The path to the APK.
-   * @param {object} editParams The package name and version code of the app.
+   * @param {object} editParams The package name of the app.
    *
    * ```typescript
-   * // promote based on an APK
-   * await apkup.promote(
-   *   {
-   *     track: 'alpha'
-   *   },
-   *   './android-debug.apk'
-   * )
-   *
-   * // promote based on package name and version code
    * await apkup.promote(
    *   {
    *     track: 'alpha',
@@ -110,28 +98,8 @@ export class Apkup {
    * )
    * ```
    */
-  public async promote (
-    promoteParams: IPromoteParams,
-    apk?: string | string[],
-    editParams?: IEditParams
-  ) {
-    let edit: IEditParams
-
-    if (apk) {
-      const apkPackage = await parseManifest(apk)
-
-      edit = {
-        packageName: apkPackage.packageName
-      }
-    } else if (editParams) {
-      edit = editParams
-    } else {
-      throw new Error(
-        'Either apk or package-name and version-code are required'
-      )
-    }
-
-    const promote = new Promote(this.client, edit, promoteParams)
+  public async promote (promoteParams: IPromoteParams, editParams: IEditParams) {
+    const promote = new Promote(this.client, editParams, promoteParams)
     return promote.run()
   }
 }

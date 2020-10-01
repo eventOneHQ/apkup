@@ -1,6 +1,6 @@
 import assert from 'assert'
 import Debug from 'debug'
-import { createReadStream } from 'fs'
+import { createReadStream, promises } from 'fs'
 import { JWT } from 'google-auth-library'
 import { extname } from 'path'
 import { Edit, IEditParams } from '../Edit'
@@ -58,8 +58,32 @@ export class Upload extends Edit {
   }
 
   public async makeEdits () {
+    await this.checkFiles()
     await this.uploadFiles()
     await this.assignTrack()
+  }
+
+  private async checkFileObject (fileObject: IUploadFile) {
+    await this.verifyFileExists(fileObject.file)
+
+    if (fileObject.mappings) {
+      await this.verifyFileExists(fileObject.mappings)
+    }
+
+    if (fileObject.obbs) {
+      await Promise.all(
+        fileObject.obbs.map(async (obb) => this.verifyFileExists(obb))
+      )
+    }
+  }
+
+  private async checkFiles () {
+    debug('> Checking all files for release')
+    return Promise.all(
+      this.uploadParams.files.map(async (fileObject) =>
+        this.checkFileObject(fileObject)
+      )
+    )
   }
 
   private async uploadFiles () {
@@ -185,5 +209,14 @@ export class Upload extends Edit {
     debug(`> Assigned APK to ${this.uploadParams.track} track`)
 
     return trackUpdate
+  }
+
+  private async verifyFileExists (file: string) {
+    try {
+      await promises.readFile(file)
+    } catch (err) {
+      debug(err)
+      throw new Error(`File verification failed. Does ${file} exist?`)
+    }
   }
 }

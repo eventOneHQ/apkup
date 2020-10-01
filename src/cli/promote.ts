@@ -16,6 +16,7 @@ export const promote = {
       })
       .option('version-code', {
         alias: 'v',
+        demandOption: true,
         describe: 'Version code of the package to promote.',
         type: 'number'
       })
@@ -40,11 +41,11 @@ export const promote = {
   desc: 'Promote an APK',
   handler: (argv) => {
     const promoteParams: IPromoteParams = {
-      track: argv.track
+      track: argv.track,
+      versionCode: argv.versionCode
     }
     const editParams: IEditParams = {
-      packageName: argv.packageName,
-      versionCode: argv.versionCode
+      packageName: argv.packageName
     }
 
     const apkup = new Apkup(argv.auth)

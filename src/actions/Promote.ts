@@ -12,6 +12,8 @@ const debug = Debug('apkup:Promote')
 export interface IPromoteParams {
   /** Specify a new track for this release. */
   track: string
+  /** Version code of the package to be edited. */
+  versionCode: number
 }
 
 export class Promote extends Edit {
@@ -49,7 +51,7 @@ export class Promote extends Edit {
     return track.releases.find((r) => {
       return (
         r.versionCodes &&
-        r.versionCodes.includes(this.editParams.versionCode.toString()) &&
+        r.versionCodes.includes(this.promoteParams.versionCode.toString()) &&
         r.status &&
         r.status === 'completed'
       )
@@ -107,7 +109,7 @@ export class Promote extends Edit {
               releaseNotes:
                 this.previousRelease && this.previousRelease.releaseNotes,
               status: 'completed',
-              versionCodes: [this.editParams.versionCode.toString()]
+              versionCodes: [this.promoteParams.versionCode.toString()]
             }
           ],
           track: newTrack

@@ -75,8 +75,7 @@ export class Apkup {
     const manifest = await parseManifest(file)
 
     const editParams: IEditParams = {
-      packageName: manifest.packageName,
-      versionCode: manifest.versionCode
+      packageName: manifest.packageName
     }
 
     const upload = new Upload(this.client, params, editParams)
@@ -102,11 +101,11 @@ export class Apkup {
    * // promote based on package name and version code
    * await apkup.promote(
    *   {
-   *     track: 'alpha'
+   *     track: 'alpha',
+   *     versionCode: 137
    *   },
    *   {
-   *     packageName: 'io.event1.shared',
-   *     versionCode: 137
+   *     packageName: 'io.event1.shared'
    *  }
    * )
    * ```
@@ -122,8 +121,7 @@ export class Apkup {
       const apkPackage = await parseManifest(apk)
 
       edit = {
-        packageName: apkPackage.packageName,
-        versionCode: apkPackage.versionCode
+        packageName: apkPackage.packageName
       }
     } else if (editParams) {
       edit = editParams

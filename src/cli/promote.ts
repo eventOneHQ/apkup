@@ -11,7 +11,7 @@ export const promote = {
       .option('track', {
         alias: 't',
         demandOption: true,
-        describe: `Can be 'internal', 'alpha', 'beta', 'production' or 'rollout'.`,
+        describe: `Can be 'internal', 'alpha', 'beta', 'production', 'rollout' or any custom track names.`,
         type: 'string'
       })
       .option('version-code', {
@@ -19,22 +19,6 @@ export const promote = {
         demandOption: true,
         describe: 'Version code of the package to promote.',
         type: 'number'
-      })
-      .option('package-name', {
-        alias: 'p',
-        describe: 'ID of the package to promote.',
-        type: 'string'
-      })
-      .check((argv) => {
-        if (argv.packageName && argv.versionCode) {
-          return true
-        } else if (argv.apk) {
-          return true
-        } else {
-          throw new Error(
-            'You must specify either package-name and version-code or apk'
-          )
-        }
       })
   },
   command: 'promote [options]',
@@ -53,7 +37,7 @@ export const promote = {
     const spinner = ora('Promoting APK...').start()
 
     apkup
-      .promote(promoteParams, argv.apk, editParams)
+      .promote(promoteParams, editParams)
       .then((resp) => {
         spinner.stop()
 

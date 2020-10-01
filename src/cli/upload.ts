@@ -4,6 +4,7 @@ import assert from 'assert'
 import ora from 'ora'
 
 import { Apkup } from '../index'
+import { IEditParams } from './../../dist/Edit.d'
 import { IUploadFile, IUploadParams } from './../actions/Upload'
 
 export const upload = {
@@ -26,13 +27,16 @@ export const upload = {
   command: 'upload [options]',
   desc: 'Upload a release',
   handler: (argv) => {
-    const options: IUploadParams = {
+    const uploadParams: IUploadParams = {
       files: [],
       releaseNotes: [],
       track: argv.track
     }
+    const editParams: IEditParams = {
+      packageName: argv.packageName
+    }
 
-    options.files = argv.file.map(
+    uploadParams.files = argv.file.map(
       (fileListString: string): IUploadFile => {
         const files = fileListString.split(',')
 
@@ -64,7 +68,7 @@ export const upload = {
     )
 
     if (argv.releaseNotes) {
-      options.releaseNotes = []
+      uploadParams.releaseNotes = []
 
       for (const change of argv.releaseNotes) {
         assert.strictEqual(
@@ -76,7 +80,7 @@ export const upload = {
         const parts = change.split('=')
         assert.strictEqual(parts.length, 2, 'Unable to parse release notes')
 
-        options.releaseNotes.push({
+        uploadParams.releaseNotes.push({
           language: parts[0],
           text: parts[1]
         })
@@ -88,7 +92,7 @@ export const upload = {
     const spinner = ora('Uploading APK...').start()
 
     apkup
-      .upload(options)
+      .upload(uploadParams, editParams)
       .then((resp) => {
         spinner.stop()
 

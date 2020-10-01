@@ -18,6 +18,12 @@ const argv = yargs
     config: true,
     demandOption: true
   })
+  .option('package-name', {
+    alias: 'p',
+    demandOption: true,
+    describe: 'Name of the package (e.g. com.example.yourapp)',
+    type: 'string'
+  })
   .option('file', {
     alias: 'f',
     describe:

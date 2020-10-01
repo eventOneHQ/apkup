@@ -43,7 +43,7 @@ export class Upload extends Edit {
 
   private versionCodes: any[] = []
 
-  constructor(
+  constructor (
     client: JWT,
     uploadParams: IUploadParams,
     editParams: IEditParams
@@ -57,12 +57,12 @@ export class Upload extends Edit {
     this.uploadParams.releaseNotes = uploadParams.releaseNotes || []
   }
 
-  public async makeEdits() {
+  public async makeEdits () {
     await this.uploadFiles()
     await this.assignTrack()
   }
 
-  private async uploadFiles() {
+  private async uploadFiles () {
     debug('> Uploading release')
     const uploads = this.uploadParams.files.map(async (fileObject) => {
       let uploadJob: any
@@ -114,7 +114,7 @@ export class Upload extends Edit {
     return Promise.all(uploads)
   }
 
-  private async uploadDeobfuscation(
+  private async uploadDeobfuscation (
     deobfuscation: string,
     versionCode: number
   ) {
@@ -134,7 +134,7 @@ export class Upload extends Edit {
     )
   }
 
-  private async uploadOBBs(obbs: string[], versionCode: number) {
+  private async uploadOBBs (obbs: string[], versionCode: number) {
     if (!obbs || !Array.isArray(obbs) || !obbs.length) {
       return
     }
@@ -146,7 +146,7 @@ export class Upload extends Edit {
     )
   }
 
-  private async uploadOBB(obb: string, versionCode: number) {
+  private async uploadOBB (obb: string, versionCode: number) {
     debug(`> Uploading expansion file ${obb} for ${versionCode}`)
 
     return this.publisher.edits.expansionfiles.upload(
@@ -164,7 +164,7 @@ export class Upload extends Edit {
     )
   }
 
-  private async assignTrack() {
+  private async assignTrack () {
     debug(`> Assigning APK to ${this.uploadParams.track} track`)
     const trackUpdate = await this.publisher.edits.tracks.update(
       {

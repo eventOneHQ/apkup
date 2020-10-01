@@ -56,8 +56,8 @@ export const upload = {
         )
 
         return {
-          mappings,
           file,
+          mappings,
           obbs
         }
       }

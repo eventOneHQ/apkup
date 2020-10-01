@@ -3,6 +3,9 @@ import Debug from 'debug'
 import { readManifest as readAabManifest } from 'node-aab-parser'
 import { extname, resolve } from 'path'
 
+/**
+ * @ignore
+ */
 const debug = Debug('apkup:helpers')
 
 export interface IPackageManifest {

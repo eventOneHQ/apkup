@@ -47,8 +47,8 @@ export const upload = {
         // obb files should always end with .obb
         const obbs = files.filter((filename) => filename.endsWith('.obb'))
 
-        // and deobfuscation mapping files should not end with .apk, .aab, or .obb
-        const deobfuscation = files.find(
+        // and mapping files should not end with .apk, .aab, or .obb
+        const mappings = files.find(
           (filename) =>
             !filename.endsWith('.apk') &&
             !filename.endsWith('.aab') &&
@@ -56,7 +56,7 @@ export const upload = {
         )
 
         return {
-          deobfuscation,
+          mappings,
           file,
           obbs
         }

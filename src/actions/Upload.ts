@@ -13,8 +13,8 @@ const debug = Debug('apkup:Upload')
 export interface IUploadFile {
   /** The APK or AAB file to upload. */
   file: string
-  /** A path to the deobfuscation file for this APK/AAB. */
-  deobfuscation?: string
+  /** A path to the deobfuscation mappings file for this APK/AAB. */
+  mappings?: string
   /** An array that specifies the paths to the expansion files (OBBs) for this APK/AAB. */
   obbs?: string[]
 }
@@ -105,8 +105,8 @@ export class Upload extends Edit {
         await this.uploadOBBs(fileObject.obbs, versionCode)
       }
 
-      if (fileObject.deobfuscation) {
-        await this.uploadDeobfuscation(fileObject.deobfuscation, versionCode)
+      if (fileObject.mappings) {
+        await this.uploadMappings(fileObject.mappings, versionCode)
       }
 
       return uploadJob
@@ -114,18 +114,15 @@ export class Upload extends Edit {
     return Promise.all(uploads)
   }
 
-  private async uploadDeobfuscation (
-    deobfuscation: string,
-    versionCode: number
-  ) {
-    debug(`> Uploading deobfuscation for ${versionCode}`)
+  private async uploadMappings (mappings: string, versionCode: number) {
+    debug(`> Uploading mappings ${mappings} for ${versionCode}`)
     return this.publisher.edits.deobfuscationfiles.upload(
       {
         apkVersionCode: versionCode,
         deobfuscationFileType: 'proguard',
         editId: this.editId,
         media: {
-          body: createReadStream(deobfuscation),
+          body: createReadStream(mappings),
           mimeType: 'application/octet-stream'
         },
         packageName: this.editParams.packageName

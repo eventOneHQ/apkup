@@ -54,7 +54,7 @@ Then use the CLI:
 apkup \
   --key api.json \
   --apk /path/to/Package.apk \
-  --deobfuscation /path/to/mapping.txt \ # optional
+  --mappings /path/to/mapping.txt \ # optional
   --release-notes "en-US=lorem ipsum dolor" \
   --obbs /path/to/Expansion.obb \  # optional
   --obbs /path/to/Expansion2.obb   # optional

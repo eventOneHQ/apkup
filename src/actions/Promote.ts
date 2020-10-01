@@ -1,16 +1,19 @@
-import assert from 'assert'
 import Debug from 'debug'
 import { JWT } from 'google-auth-library'
 import { androidpublisher_v3 } from 'googleapis'
-import { checkTrack } from './../helpers'
 
-import { Edit, IEditParams, IEditResponse } from './../Edit'
+import { Edit, IEditParams } from './../Edit'
 
+/**
+ * @ignore
+ */
 const debug = Debug('apkup:Promote')
 
 export interface IPromoteParams {
-  /** Specify track for this release. Can be one of the [[tracks]]. */
+  /** Specify a new track for this release. */
   track: string
+  /** Version code of the package to be edited. */
+  versionCode: number
 }
 
 export class Promote extends Edit {
@@ -28,8 +31,6 @@ export class Promote extends Edit {
 
     if (promoteParams.track) {
       promoteParams.track = promoteParams.track.toLowerCase()
-
-      assert(checkTrack(promoteParams.track), 'Unknown track')
     }
 
     this.promoteParams = promoteParams
@@ -50,7 +51,7 @@ export class Promote extends Edit {
     return track.releases.find((r) => {
       return (
         r.versionCodes &&
-        r.versionCodes.includes(this.editParams.versionCode.toString()) &&
+        r.versionCodes.includes(this.promoteParams.versionCode.toString()) &&
         r.status &&
         r.status === 'completed'
       )
@@ -108,7 +109,7 @@ export class Promote extends Edit {
               releaseNotes:
                 this.previousRelease && this.previousRelease.releaseNotes,
               status: 'completed',
-              versionCodes: [this.editParams.versionCode.toString()]
+              versionCodes: [this.promoteParams.versionCode.toString()]
             }
           ],
           track: newTrack

@@ -53,14 +53,21 @@ Then use the CLI:
 ```bash
 apkup \
   --key api.json \
-  --apk /path/to/Package.apk \
-  --deobfuscation /path/to/mapping.txt \ # optional
-  --release-notes "en-US=lorem ipsum dolor" \
-  --obbs /path/to/Expansion.obb \  # optional
-  --obbs /path/to/Expansion2.obb   # optional
+  --file /path/to/Package-arm64.apk
+  --file /path/to/Package-armv7.apk
+  --release-notes "en-US=lorem ipsum dolor"
 ```
 
-You can also specify each parameter via environment variables prefixed with `APKUP_` (e.g. `APKUP_KEY` or `APKUP_APK`).
+You can also specify each parameter via environment variables prefixed with `APKUP_` (e.g. `APKUP_KEY` or `APKUP_FILE`).
+
+If you want to specify additional expansion files or deobfuscation mappings, you can add them in a comma separated list after the APK/AAB file like so. The APK/AAB must always be the first file in the list.
+
+```bash
+apkup \
+  --key api.json \
+  --file /path/to/Package.apk,/path/to/mapping.txt,/path/to/Expansion.obb,/path/to/Expansion2.obb
+  --release-notes "en-US=lorem ipsum dolor"
+```
 
 ### Library
 
@@ -78,18 +85,28 @@ const apkup = new Apkup({
 });
 
 apkup
-  .upload('/path/to/apk', {
-    obbs: [
-      // optional expansion files (max 2)
-      '/path/to/somefile.obb'
-    ],
-    releaseNotes: [
-      {
-        language: 'en-US',
-        text: 'Minor bug fixes...'
-      }
-    ]
-  })
+  .upload(
+    {
+      files: [
+        {
+          file: '/path/to/Package.apk',
+          // optional expansion files (max 2)
+          obbs: ['/path/to/Expansion.obb'],
+          // optional mappings file
+          mappings: '/path/to/mapping.txt'
+        }
+      ],
+      releaseNotes: [
+        {
+          language: 'en-US',
+          text: 'Minor bug fixes...'
+        }
+      ]
+    },
+    {
+      packageName: 'io.event1.shared'
+    }
+  )
   .then(data => {
     console.log(` > ${data.packageName} version ${data.versionCode} is up!`);
   });

@@ -7,44 +7,29 @@ import { Apkup } from '../index'
 
 export const promote = {
   builder: (yargs) => {
-    yargs
+    return yargs
       .option('track', {
         alias: 't',
         demandOption: true,
-        describe: `Can be 'internal', 'alpha', 'beta', 'production' or 'rollout'.`,
+        describe: `Can be 'internal', 'alpha', 'beta', 'production', 'rollout' or any custom track names.`,
         type: 'string'
       })
       .option('version-code', {
         alias: 'v',
+        demandOption: true,
         describe: 'Version code of the package to promote.',
         type: 'number'
-      })
-      .option('package-name', {
-        alias: 'p',
-        describe: 'ID of the package to promote.',
-        type: 'string'
-      })
-      .check((argv) => {
-        if (argv.packageName && argv.versionCode) {
-          return true
-        } else if (argv.apk) {
-          return true
-        } else {
-          throw new Error(
-            'You must specify either package-name and version-code or apk'
-          )
-        }
       })
   },
   command: 'promote [options]',
   desc: 'Promote an APK',
   handler: (argv) => {
     const promoteParams: IPromoteParams = {
-      track: argv.track
+      track: argv.track,
+      versionCode: argv.versionCode
     }
     const editParams: IEditParams = {
-      packageName: argv.packageName,
-      versionCode: argv.versionCode
+      packageName: argv.packageName
     }
 
     const apkup = new Apkup(argv.auth)
@@ -52,7 +37,7 @@ export const promote = {
     const spinner = ora('Promoting APK...').start()
 
     apkup
-      .promote(promoteParams, argv.apk, editParams)
+      .promote(promoteParams, editParams)
       .then((resp) => {
         spinner.stop()
 

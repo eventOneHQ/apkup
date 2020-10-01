@@ -3,20 +3,19 @@ import Debug from 'debug'
 import { JWT } from 'google-auth-library'
 import { androidpublisher_v3, google } from 'googleapis'
 
+/**
+ * @ignore
+ */
 const debug = Debug('apkup:Edit')
 
 export interface IEditParams {
   /** ID of the package to be edited. */
   packageName: string
-  /** Version code of the package to be edited. */
-  versionCode: number
 }
 
 export interface IEditResponse {
   /** ID of the package that was edited. */
   packageName?: string
-  /** Version code of the package that was edited. */
-  versionCode?: number
 }
 
 /**
@@ -50,7 +49,6 @@ export class Edit {
   constructor (client: JWT, editParams: IEditParams) {
     assert(client, 'I require a client')
     assert(editParams.packageName, 'I require a package name')
-    assert(editParams.versionCode, 'I require a version code')
 
     this.client = client
     this.publisher = google.androidpublisher({
@@ -84,8 +82,7 @@ export class Edit {
     await this.commitChanges()
 
     return {
-      packageName: this.editParams.packageName,
-      versionCode: this.editParams.versionCode
+      packageName: this.editParams.packageName
     }
   }
 

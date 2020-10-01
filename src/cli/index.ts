@@ -18,9 +18,16 @@ const argv = yargs
     config: true,
     demandOption: true
   })
-  .option('apk', {
-    alias: 'a',
-    describe: 'Path to the APK file',
+  .option('package-name', {
+    alias: 'p',
+    demandOption: true,
+    describe: 'Name of the package (e.g. com.example.yourapp)',
+    type: 'string'
+  })
+  .option('file', {
+    alias: 'f',
+    describe:
+      'Paths to an APK or AAB. OBBs and a deobfuscation mappings file for the package can be included by adding a comma separated list after the main file.',
     type: 'array'
   })
   .config(

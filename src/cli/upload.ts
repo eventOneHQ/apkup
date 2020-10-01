@@ -3,14 +3,14 @@
 import assert from 'assert'
 import ora from 'ora'
 
+import { IEditParams } from '../Edit'
 import { Apkup } from '../index'
-import { IEditParams } from './../../dist/Edit.d'
 import { IUploadFile, IUploadParams } from './../actions/Upload'
 
 export const upload = {
   aliases: ['$0'],
   builder: (cmd) => {
-    cmd
+    return cmd
       .option('track', {
         alias: 't',
         default: 'internal',

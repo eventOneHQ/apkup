@@ -7,7 +7,7 @@ import { Apkup } from '../index'
 
 export const promote = {
   builder: (yargs) => {
-    yargs
+    return yargs
       .option('track', {
         alias: 't',
         demandOption: true,

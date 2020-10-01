@@ -85,23 +85,28 @@ const apkup = new Apkup({
 });
 
 apkup
-  .upload({
-    files: [
-      file: '/path/to/Package.apk',
-      // optional expansion files (max 2)
-      obbs: [
-        '/path/to/Expansion.obb'
+  .upload(
+    {
+      files: [
+        {
+          file: '/path/to/Package.apk',
+          // optional expansion files (max 2)
+          obbs: ['/path/to/Expansion.obb'],
+          // optional mappings file
+          mappings: '/path/to/mapping.txt'
+        }
       ],
-      // optional mappings file
-      mappings: '/path/to/mapping.txt'
-    ],
-    releaseNotes: [
-      {
-        language: 'en-US',
-        text: 'Minor bug fixes...'
-      }
-    ]
-  })
+      releaseNotes: [
+        {
+          language: 'en-US',
+          text: 'Minor bug fixes...'
+        }
+      ]
+    },
+    {
+      packageName: 'io.event1.shared'
+    }
+  )
   .then(data => {
     console.log(` > ${data.packageName} version ${data.versionCode} is up!`);
   });

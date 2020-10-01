@@ -10,7 +10,7 @@
   "scripts": {
     "prepublishOnly": "npm run build && npm prune",
     "build": "tsc",
-    "docs": "typedoc --mode file --excludeExternals --excludeNotExported --exclude 'src/cli.ts' --out docs src",
+    "docs": "typedoc --mode file --excludeExternals --excludeNotExported --exclude 'src/cli/*.ts' --out docs src",
     "test": "tslint -c tslint.json 'src/**/*.ts'",
     "test:audit": "npm audit --json | npm-audit-html --output reports/audit.html && npm audit",
     "semantic-release": "semantic-release"

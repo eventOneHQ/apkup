@@ -3,6 +3,9 @@ import Debug from 'debug'
 import { JWT } from 'google-auth-library'
 import { androidpublisher_v3, google } from 'googleapis'
 
+/**
+ * @ignore
+ */
 const debug = Debug('apkup:Edit')
 
 export interface IEditParams {

@@ -3,6 +3,9 @@ import Debug from 'debug'
 import { readManifest as readAabManifest } from 'node-aab-parser'
 import { extname, resolve } from 'path'
 
+/**
+ * @ignore
+ */
 const debug = Debug('apkup:helpers')
 
 export interface IPackageManifest {
@@ -49,25 +52,4 @@ export const parseManifest = async (
   debug(`> Detected version code ${manifest.versionCode}`)
 
   return manifest
-}
-
-/**
- * Available tracks
- */
-export const tracks: string[] = [
-  'internal',
-  'alpha',
-  'beta',
-  'production',
-  'rollout'
-]
-
-/**
- * Check if a track is valid
- * @param track Name of the track to check
- *
- * @returns Does the track exits?
- */
-export const checkTrack = (track: string): boolean => {
-  return tracks.includes(track)
 }

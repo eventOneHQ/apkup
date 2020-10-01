@@ -45,14 +45,18 @@ export class Apkup {
   }
 
   /**
-   * Upload an APK to the Google Play Developer Console.
-   * @param {string} apk The path to the APK.
-   * @param {object} uploadParams The params object will add additional information to this release.
+   * Upload a release to the Google Play Developer Console.
+   * @param {object} params The params object includes the information for this release.
    *
    * @returns An object with the response data.
    *
    * ```typescript
-   * const upload = await apkup.upload('./android-debug.apk', {
+   * const upload = await apkup.upload({
+   *   files: [
+   *     {
+   *       file: './android-debug.apk'
+   *     }
+   *   ],
    *   track: 'beta',
    *   releaseNotes: [
    *     {
@@ -63,18 +67,19 @@ export class Apkup {
    * })
    * ```
    */
-  public async upload (
-    apk: string | string[],
-    uploadParams?: IUploadParams
-  ): Promise<IEditResponse> {
-    const apkPackage = await parseManifest(apk)
+  public async upload (params: IUploadParams): Promise<IEditResponse> {
+    const file = params.files[0]?.file
+
+    assert(file, 'At least one file is required')
+
+    const manifest = await parseManifest(file)
 
     const editParams: IEditParams = {
-      packageName: apkPackage.packageName,
-      versionCode: apkPackage.versionCode
+      packageName: manifest.packageName,
+      versionCode: manifest.versionCode
     }
 
-    const upload = new Upload(this.client, apk, uploadParams, editParams)
+    const upload = new Upload(this.client, params, editParams)
     return upload.run()
   }
 

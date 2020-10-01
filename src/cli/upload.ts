@@ -4,7 +4,7 @@ import assert from 'assert'
 import ora from 'ora'
 
 import { Apkup } from '../index'
-import { IUploadParams } from './../actions/Upload'
+import { IUploadFile, IUploadParams } from './../actions/Upload'
 
 export const upload = {
   aliases: ['$0'],
@@ -13,7 +13,7 @@ export const upload = {
       .option('track', {
         alias: 't',
         default: 'internal',
-        describe: `Can be 'internal', 'alpha', 'beta', 'production' or 'rollout'. Default: 'internal'`,
+        describe: `Can be 'internal', 'alpha', 'beta', 'production', 'rollout' or any custom track names. Default: 'internal'`,
         type: 'string'
       })
       .option('release-notes', {
@@ -21,27 +21,47 @@ export const upload = {
         describe: `A string with the format 'lang=changes'`,
         type: 'array'
       })
-      .option('deobfuscation', {
-        alias: 'd',
-        describe: 'Path to optional deobfuscation file',
-        type: 'string'
-      })
-      .option('obbs', {
-        alias: 'o',
-        describe: 'Path to optional expansion files (max 2)',
-        type: 'array'
-      })
-      .demandOption(['apk'])
+      .demandOption(['file'])
   },
   command: 'upload [options]',
-  desc: 'Upload an APK',
+  desc: 'Upload a release',
   handler: (argv) => {
     const options: IUploadParams = {
-      deobfuscation: argv.deobfuscation,
-      obbs: argv.obbs,
+      files: [],
       releaseNotes: [],
       track: argv.track
     }
+
+    options.files = argv.file.map(
+      (fileListString: string): IUploadFile => {
+        const files = fileListString.split(',')
+
+        // the actual file should always be first and should always be an AAB or APK
+        const file = files[0]
+        assert.strictEqual(
+          file.endsWith('.apk') || file.endsWith('.aab'),
+          true,
+          'The first file must be either an APK or an AAB.'
+        )
+
+        // obb files should always end with .obb
+        const obbs = files.filter((filename) => filename.endsWith('.obb'))
+
+        // and mapping files should not end with .apk, .aab, or .obb
+        const mappings = files.find(
+          (filename) =>
+            !filename.endsWith('.apk') &&
+            !filename.endsWith('.aab') &&
+            !filename.endsWith('.obb')
+        )
+
+        return {
+          file,
+          mappings,
+          obbs
+        }
+      }
+    )
 
     if (argv.releaseNotes) {
       options.releaseNotes = []
@@ -68,7 +88,7 @@ export const upload = {
     const spinner = ora('Uploading APK...').start()
 
     apkup
-      .upload(argv.apk, options)
+      .upload(options)
       .then((resp) => {
         spinner.stop()
 

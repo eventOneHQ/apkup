@@ -12,7 +12,7 @@ jobs:
     - stage: test
       node_js: lts/*
       script:
-        - npm run test || true
+        - npm run lint || true
         - npm run docs
       deploy:
         provider: pages

@@ -1,4 +1,4 @@
-name: Node CI
+name: Audit / Lint
 
 on: [pull_request, push]
 
@@ -22,22 +22,3 @@ jobs:
           node-version: 12
       - run: npm ci
       - run: npm run test:audit
-  test:
-    name: Node v${{ matrix.node-version }} on ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: [10.x, 12.x, 13.x, 14.x, 15.x]
-        os: [ubuntu-latest, macOS-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-
-    steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: install
-        run: npm ci
-      - name: run tests
-        run: npm run test -- --coverage

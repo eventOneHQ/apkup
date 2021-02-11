@@ -34,7 +34,7 @@
     "adbkit-apkreader": "^3.2.0",
     "debug": "^4.3.1",
     "googleapis": "^52.1.0",
-    "node-aab-parser": "^1.0.0",
+    "node-aab-parser": "^1.0.1",
     "ora": "^4.1.1",
     "yargs": "^15.4.1"
   },

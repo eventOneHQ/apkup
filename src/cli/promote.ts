@@ -1,13 +1,14 @@
 // tslint:disable: no-console
 import ora from 'ora'
+import { CommandModule } from 'yargs'
 
 import { IPromoteParams } from '../actions/Promote'
 import { IEditParams } from '../Edit'
 import { Apkup } from '../index'
 
-export const promote = {
+export const promote: CommandModule = {
   builder: (yargs) => {
-    yargs
+    return yargs
       .option('track', {
         alias: 't',
         demandOption: true,
@@ -37,8 +38,8 @@ export const promote = {
       })
   },
   command: 'promote [options]',
-  desc: 'Promote an APK',
-  handler: (argv) => {
+  describe: 'Promote an APK',
+  handler: (argv: any) => {
     const promoteParams: IPromoteParams = {
       track: argv.track
     }

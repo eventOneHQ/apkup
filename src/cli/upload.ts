@@ -2,14 +2,15 @@
 
 import assert from 'assert'
 import ora from 'ora'
+import { CommandModule } from 'yargs'
 
 import { Apkup } from '../index'
 import { IUploadParams } from './../actions/Upload'
 
-export const upload = {
+export const upload: CommandModule = {
   aliases: ['$0'],
   builder: (cmd) => {
-    cmd
+    return cmd
       .option('track', {
         alias: 't',
         default: 'internal',
@@ -34,8 +35,8 @@ export const upload = {
       .demandOption(['apk'])
   },
   command: 'upload [options]',
-  desc: 'Upload an APK',
-  handler: (argv) => {
+  describe: 'Upload an APK',
+  handler: (argv: any) => {
     const options: IUploadParams = {
       deobfuscation: argv.deobfuscation,
       obbs: argv.obbs,

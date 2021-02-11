@@ -33,4 +33,5 @@ const argv = yargs
   .command(promote)
   .command(upload)
   .env('APKUP')
-  .help('help').argv
+  .help('help')
+  .alias('help', 'h').argv

@@ -37,10 +37,10 @@ Install the `apkup` package globally or locally:
 
 ```bash
 npm i -g apkup
-apkup -h
+apkup --help
 
 # or if you just want to use the CLI locally
-npx apkup -h
+npx apkup --help
 
 # or install the library into your project
 npm i -D apkup

@@ -113,7 +113,7 @@ The created Service Account needs the following role:
 
 ## 🎈 Usage <a name="usage"></a>
 
-See the full docs [here](https://oss.eventone.page/apkup/classes/apkup).
+See the full docs [here](https://oss.eventone.page/apkup/classes/index.apkup).
 
 ## ✍️ Authors <a name = "authors"></a>
 

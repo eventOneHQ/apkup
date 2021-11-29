@@ -10,7 +10,7 @@
   "scripts": {
     "prepublishOnly": "npm run build && npm prune",
     "build": "tsc",
-    "docs": "typedoc --excludeExternals --exclude 'src/cli/*.ts' --out docs src",
+    "docs": "typedoc --excludeExternals --exclude 'src/cli/*.ts' --entryPointStrategy expand --out docs src",
     "test": "tslint --project tsconfig.json -c tslint.json 'src/**/*.ts'",
     "test:audit": "npm audit --json | npm-audit-html --output reports/audit.html && npm audit",
     "semantic-release": "semantic-release"
@@ -40,14 +40,14 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.5",
-    "@types/node": "^14.14.25",
+    "@types/node": "^16.11.10",
     "@types/yargs": "^16.0.0",
-    "npm-audit-html": "^1.5.0",
+    "npm-audit-html": "^2.0.0-beta.1",
     "semantic-release": "^17.3.8",
     "tslint": "^6.1.3",
     "tslint-config-standard": "^9.0.0",
-    "typedoc": "^0.20.24",
-    "typescript": "^3.9.9"
+    "typedoc": "^0.22.10",
+    "typescript": "^4.5.2"
   },
   "release": {
     "branches": [

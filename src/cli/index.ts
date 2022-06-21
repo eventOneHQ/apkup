@@ -23,6 +23,11 @@ const argv = yargs
     describe: 'Path to the APK file',
     type: 'array'
   })
+  .option('changesNotSentForReview', {
+    alias: 'cnsfr',
+    describe: 'Pass this argument if your App is under review to fix ERROR: Changes cannot be sent for review automatically',
+    type: 'boolean'
+  })
   .config(
     'key',
     'Path to a JSON file that contains the private key and client email (can be specified via APKUP_KEY env variable)',

@@ -18,6 +18,8 @@ export interface IUploadParams {
   obbs?: string[]
   /** A paths to the deobfuscation file for this release. */
   deobfuscation?: string
+
+  changesNotSentForReview?: boolean
 }
 
 export interface IReleaseNotes {

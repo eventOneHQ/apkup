@@ -23,6 +23,11 @@ const argv = yargs
     describe: 'Path to the APK file',
     type: 'array'
   })
+  .option('changesNotSentForReview', {
+    alias: 'cnsfr',
+    describe: 'Indicates that the changes in publish will not be reviewed until they are explicitly sent for review from the Google Play Console UI. These changes will be added to any other changes that are not yet sent for review',
+    type: 'boolean'
+  })
   .config(
     'key',
     'Path to a JSON file that contains the private key and client email (can be specified via APKUP_KEY env variable)',

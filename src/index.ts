@@ -71,7 +71,8 @@ export class Apkup {
 
     const editParams: IEditParams = {
       packageName: apkPackage.packageName,
-      versionCode: apkPackage.versionCode
+      versionCode: apkPackage.versionCode,
+      changesNotSentForReview: uploadParams?.changesNotSentForReview || false
     }
 
     const upload = new Upload(this.client, apk, uploadParams, editParams)
@@ -118,7 +119,8 @@ export class Apkup {
 
       edit = {
         packageName: apkPackage.packageName,
-        versionCode: apkPackage.versionCode
+        versionCode: apkPackage.versionCode,
+        changesNotSentForReview: editParams?.changesNotSentForReview || false
       }
     } else if (editParams) {
       edit = editParams

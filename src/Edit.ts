@@ -10,6 +10,8 @@ export interface IEditParams {
   packageName: string
   /** Version code of the package to be edited. */
   versionCode: number
+  /** Weather to set changesNotSentForReview to true. */
+  changesNotSentForReview: boolean
 }
 
 export interface IEditResponse {
@@ -112,7 +114,8 @@ export class Edit {
     debug('> Commiting changes')
     const editCommit = await this.publisher.edits.commit({
       editId: this.editId,
-      packageName: this.editParams.packageName
+      packageName: this.editParams.packageName,
+      changesNotSentForReview: this.editParams.changesNotSentForReview ? 'true' : undefined
     })
 
     debug('> Commited changes')

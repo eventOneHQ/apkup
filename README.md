@@ -26,6 +26,7 @@ A fork of [playup](https://github.com/jeduan/playup).
 - [Usage](#usage)
 - [Authentication](#authentication)
 - [Contributing](CONTRIBUTING.md)
+- [Troubleshooting](#troubleshooting)
 - [Authors](#authors)
 - [Acknowledgments](#acknowledgement)
 
@@ -114,6 +115,13 @@ The created Service Account needs the following role:
 ## 🎈 Usage <a name="usage"></a>
 
 See the full docs [here](https://oss.eventone.page/apkup/classes/index.apkup).
+
+## Troubleshooting
+
+If you receive "ERROR: Changes cannot be sent for review automatically. Please set the query parameter changesNotSentForReview to true. Once committed, the changes in this edit can be sent for review from the Google Play Console UI."
+
+then just pass `--changesNotSentForReview` param
+
 
 ## ✍️ Authors <a name = "authors"></a>
 

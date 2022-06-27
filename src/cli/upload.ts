@@ -41,7 +41,8 @@ export const upload: CommandModule = {
       deobfuscation: argv.deobfuscation,
       obbs: argv.obbs,
       releaseNotes: [],
-      track: argv.track
+      track: argv.track,
+      changesNotSentForReview: argv.changesNotSentForReview
     }
 
     if (argv.releaseNotes) {

@@ -45,7 +45,8 @@ export const promote: CommandModule = {
     }
     const editParams: IEditParams = {
       packageName: argv.packageName,
-      versionCode: argv.versionCode
+      versionCode: argv.versionCode,
+      changesNotSentForReview: argv.changesNotSentForReview
     }
 
     const apkup = new Apkup(argv.auth)

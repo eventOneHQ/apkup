@@ -25,7 +25,7 @@ const argv = yargs
   })
   .option('changesNotSentForReview', {
     alias: 'cnsfr',
-    describe: 'Pass this argument if your App is under review to fix ERROR: Changes cannot be sent for review automatically',
+    describe: 'Indicates that the changes in publish will not be reviewed until they are explicitly sent for review from the Google Play Console UI. These changes will be added to any other changes that are not yet sent for review',
     type: 'boolean'
   })
   .config(
